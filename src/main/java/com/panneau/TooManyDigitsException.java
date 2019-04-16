@@ -6,7 +6,7 @@ package com.panneau;
  * @since ever
  * @version 1.0
  */
-class TooManyDigitsException extends Exception {
+public class TooManyDigitsException extends Exception {
     TooManyDigitsException(int overSize, int max){
         super("Il y a "+ overSize+" chiffres en trop: le maximum affichable est "+max);
     }
