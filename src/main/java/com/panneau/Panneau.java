@@ -46,7 +46,7 @@ public class Panneau {
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
     public Panneau()throws I2CFactory.UnsupportedBusNumberException,IOException {
-        this(RaspiPin.GPIO_11, RaspiPin.GPIO_13, RaspiPin.GPIO_15, RaspiPin.GPIO_07);
+        this(RaspiPin.GPIO_00, RaspiPin.GPIO_02, RaspiPin.GPIO_03, RaspiPin.GPIO_07);
     }
 
     /**
