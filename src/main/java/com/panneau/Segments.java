@@ -27,23 +27,34 @@ public class Segments {
         int i=0;
         while(i2CBus==null) {
             try {
-                i2CBus = I2CFactory.getInstance(i);
                 System.out.println("Test sur port "+i);
+                i2CBus = I2CFactory.getInstance(i);
             } catch (I2CFactory.UnsupportedBusNumberException e) {
                 ++i;
             }
             if(i==18){
-                System.out.println("Ports de 1 à 18 testés");
+                System.out.println("Ports de 0 à 17 testés, aucun ne répond");
                 //throw new I2CFactory.UnsupportedBusNumberException();
             }
         }
-        int displayAddress;
+        int displayAddress=0x03;
+        device=null;
+        while(device==null && displayAddress<=0x77){
+            try {
+                device=i2CBus.getDevice(i);
+            }catch (IOException e){
+                System.out.println("Adresse "+i+": aucune réponse");
+                ++i;
+            }
+        }
+        System.out.println("Connecté à l'adresse "+i);
+        /*
         if(address.length==1){
             displayAddress=address[0];
         }else{
             displayAddress=0x71;
         }
-        device=i2CBus.getDevice(displayAddress);
+        device=i2CBus.getDevice(displayAddress);*/
     }
 
     /**
