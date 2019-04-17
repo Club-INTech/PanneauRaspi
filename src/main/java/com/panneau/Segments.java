@@ -23,11 +23,17 @@ public class Segments {
      * @throws com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException Si le modèle de Raspi utilisé
      */
     public Segments(int... address) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        I2CBus i2CBus;
-        try{
-            i2CBus= I2CFactory.getInstance(I2CBus.BUS_1);
-        }catch (I2CFactory.UnsupportedBusNumberException e){
-            i2CBus= I2CFactory.getInstance(I2CBus.BUS_0);
+        I2CBus i2CBus=null;
+        int i=0;
+        while(i2CBus==null) {
+            try {
+                i2CBus = I2CFactory.getInstance(i);
+            } catch (I2CFactory.UnsupportedBusNumberException e) {
+                ++i;
+            }
+            if(i==18){
+                throw new I2CFactory.UnsupportedBusNumberException();
+            }
         }
         int displayAddress;
         if(address.length==1){
