@@ -22,7 +22,7 @@ public class Segments {
      * @param address l'adresse de l'afficheur sur le bus I2C. La valeur 0x71 est prise par défaut si aucune ou plousieurs valeurs sont renseignées.
      * @throws com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException Si le modèle de Raspi utilisé
      */
-    public Segments(int... address) throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public Segments(int... address) throws IOException {
         I2CBus i2CBus=null;
         int i=0;
         while(i2CBus==null) {

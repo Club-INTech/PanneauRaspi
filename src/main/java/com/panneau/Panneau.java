@@ -45,7 +45,7 @@ public class Panneau {
      * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
-    public Panneau()throws I2CFactory.UnsupportedBusNumberException,IOException {
+    public Panneau()throws IOException {
         this(RaspiPin.GPIO_00, RaspiPin.GPIO_02, RaspiPin.GPIO_03, RaspiPin.GPIO_07);
     }
 
@@ -59,7 +59,7 @@ public class Panneau {
      * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
-    public Panneau(Pin LEDRedPin, Pin LEDGreenPin, Pin LEDBluePin, Pin SwitchPin) throws I2CFactory.UnsupportedBusNumberException,IOException {
+    public Panneau(Pin LEDRedPin, Pin LEDGreenPin, Pin LEDBluePin, Pin SwitchPin) throws IOException {
         segments=new Segments();
         led=new LED(LEDRedPin,LEDGreenPin,LEDBluePin, null);
         interrupteur=new Interrupteur(SwitchPin, null);
