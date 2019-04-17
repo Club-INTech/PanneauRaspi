@@ -20,14 +20,15 @@ public class Segments {
     /**
      * Initialise le bus I2C et crée une instance de Segments.
      * @param address l'adresse de l'afficheur sur le bus I2C. La valeur 0x71 est prise par défaut si aucune ou plousieurs valeurs sont renseignées.
-     * @throws com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException Si le modèle de Raspi utilisé
      */
     public Segments(int... address) throws IOException {
         I2CBus i2CBus=null;
+        System.out.println("Entre dans le constructeur du 7 segments");
         int i=0;
         while(i2CBus==null) {
             try {
                 i2CBus = I2CFactory.getInstance(i);
+                System.out.println("Test sur port "+i);
             } catch (I2CFactory.UnsupportedBusNumberException e) {
                 ++i;
             }
