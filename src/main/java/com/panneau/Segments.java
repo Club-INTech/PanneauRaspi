@@ -33,7 +33,7 @@ public class Segments {
             }
             if(i==18){
                 System.out.println("Ports de 1 à 18 testés");
-                throw new I2CFactory.UnsupportedBusNumberException();
+                //throw new I2CFactory.UnsupportedBusNumberException();
             }
         }
         int displayAddress;
