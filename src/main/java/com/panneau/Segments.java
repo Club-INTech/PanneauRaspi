@@ -42,7 +42,9 @@ public class Segments {
         while(device==null && displayAddress<=0x77){
             try {
                 device=i2CBus.getDevice(displayAddress);
+                System.out.println("getDevice a fonctionné");
                 device.write(toByteArray(0x81));
+                System.out.println("write a fonctionné");
             }catch (IOException e){
                 System.out.println("Adresse "+String.format("0x%x", displayAddress)+": aucune réponse");
                 ++displayAddress;
