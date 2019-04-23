@@ -21,7 +21,7 @@ public class Segments {
      * Initialise le bus I2C et crée une instance de Segments.
      * @param address l'adresse de l'afficheur sur le bus I2C. La valeur 0x71 est prise par défaut si aucune ou plousieurs valeurs sont renseignées.
      */
-    public Segments(int... address) throws IOException {
+    public Segments(int... address) throws IOException, I2CFactory.UnsupportedBusNumberException {
         I2CBus i2CBus=null;
         System.out.println("Entre dans le constructeur du 7 segments");
         int i=0;
@@ -34,27 +34,28 @@ public class Segments {
             }
             if(i==18){
                 System.out.println("Ports de 0 à 17 testés, aucun ne répond");
-                //throw new I2CFactory.UnsupportedBusNumberException();
+                throw new I2CFactory.UnsupportedBusNumberException();
             }
         }
         int displayAddress=0x03;
+        //*
         device=null;
         while(device==null && displayAddress<=0x77){
             try {
-                device=i2CBus.getDevice(i);
+                device=i2CBus.getDevice(displayAddress);
             }catch (IOException e){
-                System.out.println("Adresse "+i+": aucune réponse");
-                ++i;
+                System.out.println("Adresse "+String.format("0x%x", displayAddress)+": aucune réponse");
+                ++displayAddress;
             }
         }
-        System.out.println("Connecté à l'adresse "+i);
+        System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));//*/
         /*
         if(address.length==1){
             displayAddress=address[0];
         }else{
             displayAddress=0x71;
         }
-        device=i2CBus.getDevice(displayAddress);*/
+        device=i2CBus.getDevice(displayAddress);//*/
     }
 
     /**
