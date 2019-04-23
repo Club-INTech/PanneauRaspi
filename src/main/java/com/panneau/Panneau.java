@@ -5,10 +5,9 @@ import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.i2c.I2CFactory;
-import com.sun.corba.se.impl.interceptors.PINoOpHandlerImpl;
-import com.sun.org.apache.bcel.internal.generic.SWITCH;
 
 import java.io.IOException;
+
 import java.util.ArrayList;
 import java.util.List;
 
