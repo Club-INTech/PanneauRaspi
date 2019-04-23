@@ -18,10 +18,9 @@ public class Segments {
     final private int maxDigits=4;
 
     /**
-     * Initialise le bus I2C et crée une instance de Segments.
-     * @param address l'adresse de l'afficheur sur le bus I2C. La valeur 0x71 est prise par défaut si aucune ou plousieurs valeurs sont renseignées.
+     * Initialise le bus I2C et crée une instance de Segments
      */
-    public Segments(int... address) throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public Segments() throws IOException, I2CFactory.UnsupportedBusNumberException {
         I2CBus i2CBus=null;
         System.out.println("Entre dans le constructeur du 7 segments");
         int i=0;
@@ -39,14 +38,15 @@ public class Segments {
         }
         int displayAddress=0x03;
         //*
-        device=null;
+        device=null;//TODO: ecrire au registre 0x81 pour un factory reset (https://github.com/sparkfun/Serial7SegmentDisplay/wiki/Special-Commands#i2cAddress)
         while(device==null && displayAddress<=0x77){
             try {
                 device=i2CBus.getDevice(displayAddress);
-                device.write(toByteArray(0));
+                device.write(toByteArray(0x81));
             }catch (IOException e){
                 System.out.println("Adresse "+String.format("0x%x", displayAddress)+": aucune réponse");
                 ++displayAddress;
+                device=null;
             }
             catch (TooManyDigitsException e){
                 //Ne fait rien MDR

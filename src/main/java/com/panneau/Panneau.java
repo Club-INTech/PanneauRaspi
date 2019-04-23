@@ -45,7 +45,7 @@ public class Panneau {
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
     public Panneau()throws IOException, I2CFactory.UnsupportedBusNumberException {
-        this(RaspiPin.GPIO_00, RaspiPin.GPIO_02, RaspiPin.GPIO_03, RaspiPin.GPIO_07);
+        this(RaspiPin.GPIO_01, RaspiPin.GPIO_02, RaspiPin.GPIO_03, RaspiPin.GPIO_07);
     }
 
     /**
@@ -59,7 +59,7 @@ public class Panneau {
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
     public Panneau(Pin LEDRedPin, Pin LEDGreenPin, Pin LEDBluePin, Pin SwitchPin) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        segments=new Segments(0x04);
+        segments=new Segments();
         led=new LED(LEDRedPin,LEDGreenPin,LEDBluePin, null);
         interrupteur=new Interrupteur(SwitchPin, null);
         if(interrupteur.getState()==PinState.HIGH){
