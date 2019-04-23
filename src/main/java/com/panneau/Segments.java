@@ -43,9 +43,14 @@ public class Segments {
         while(device==null && displayAddress<=0x77){
             try {
                 device=i2CBus.getDevice(displayAddress);
+                device.write(toByteArray(0));
             }catch (IOException e){
                 System.out.println("Adresse "+String.format("0x%x", displayAddress)+": aucune réponse");
                 ++displayAddress;
+            }
+            catch (TooManyDigitsException e){
+                //Ne fait rien MDR
+                //A quel moment "0" ferait lever cette exception
             }
         }
         System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));//*/
