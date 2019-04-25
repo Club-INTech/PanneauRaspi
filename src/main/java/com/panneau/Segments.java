@@ -9,6 +9,7 @@ import java.io.IOException;
 
 /**
  * Cette classe contrôle un module Sparkfun de 4 afficheurs 7 segments contrôlé en I2C.
+ * Lien de la datasheet: https://github.com/sparkfun/Serial7SegmentDisplay/wiki/Serial-7-Segment-Display-Datasheet
  * @author rene
  * @since ever
  * @version 1.0
@@ -18,53 +19,62 @@ public class Segments {
     final private int maxDigits=4;
 
     /**
-     * Initialise le bus I2C et crée une instance de Segments
+     * Initialise le bus I2C et crée une instance de Segments en envoyant un factory reset sur le broadcast
      */
-    public Segments() throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public Segments() throws  IOException, I2CFactory.UnsupportedBusNumberException {
+        this(false);
+    }
+
+    /**
+     * Initialise le bus I2C et crée une instance de Segments
+     * @param scan Pour scanner toutes les adresses, sinon envoie "factory reset" au broadcast
+     * @throws IOException
+     * @throws I2CFactory.UnsupportedBusNumberException
+     */
+    public Segments(boolean scan) throws IOException, I2CFactory.UnsupportedBusNumberException {
         I2CBus i2CBus=null;
-        System.out.println("Entre dans le constructeur du 7 segments");
+        //System.out.println("Entre dans le constructeur du 7 segments");
         int i=0;
         while(i2CBus==null) {
             try {
-                System.out.println("Test sur port "+i);
+                //System.out.println("Test sur port "+i);
                 i2CBus = I2CFactory.getInstance(i);
             } catch (I2CFactory.UnsupportedBusNumberException e) {
                 ++i;
             }
             if(i==18){
-                System.out.println("Ports de 0 à 17 testés, aucun ne répond");
+                //System.out.println("Ports de 0 à 17 testés, aucun ne répond");
                 throw new I2CFactory.UnsupportedBusNumberException();
             }
         }
-        int displayAddress=0x03;
+        if(!scan) {
+            i2CBus.getDevice(0x00).write((byte) 0x81); //envoie "factory reset" sur le broadcast
+        }
+        int displayAddress=0x71;
         //*
-        device=null;//TODO: ecrire au registre 0x81 pour un factory reset (https://github.com/sparkfun/Serial7SegmentDisplay/wiki/Special-Commands#i2cAddress)
-        while(device==null && displayAddress<=0x77){
-            try {
-                device=i2CBus.getDevice(displayAddress);
-                Thread.sleep(1);// je sais pas si c'est utile mais on verra
-                device.write(toByteArray(0x81));
-            }catch (IOException e){
-                System.out.println("Adresse "+String.format("0x%x", displayAddress)+": aucune réponse");
-                ++displayAddress;
-                device=null;
-            }
-            catch (TooManyDigitsException e){
-                //Ne fait rien MDR
-                //A quel moment "0" ferait lever cette exception
-            }
-            catch (InterruptedException e){
-                e.printStackTrace();
+        if(scan) {
+            displayAddress=0x03;
+            device = null;
+            while (device == null && displayAddress <= 0x77) {
+                try {
+                    device = i2CBus.getDevice(displayAddress);
+                    Thread.sleep(1);// je sais pas si c'est utile mais on verra
+                    device.write(toByteArray(0x81));
+                } catch (IOException e) {
+                    //System.out.println("Adresse " + String.format("0x%x", displayAddress) + ": aucune réponse"); //Print de debug
+                    ++displayAddress;
+                    device = null;
+                } catch (TooManyDigitsException e) {
+                    //Ne fait rien MDR
+                    //A quel moment "0" ferait lever cette exception
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
-        System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));//*/
-        /*
-        if(address.length==1){
-            displayAddress=address[0];
-        }else{
-            displayAddress=0x71;
-        }
-        device=i2CBus.getDevice(displayAddress);//*/
+        //System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));
+        //*/
+        device=i2CBus.getDevice(displayAddress);
     }
 
     /**
