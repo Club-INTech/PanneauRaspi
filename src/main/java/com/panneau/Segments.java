@@ -103,15 +103,15 @@ public class Segments {
                     device = i2CBus.getDevice(displayAddress);
                     Thread.sleep(1);// je sais pas si c'est utile mais on verra
                     device.write(toByteArray(0x81));
-                } catch (IOException e) {
+                } catch (IOException er) {
                     //System.out.println("Adresse " + String.format("0x%x", displayAddress) + ": aucune réponse"); //Print de debug
                     ++displayAddress;
                     device = null;
-                } catch (TooManyDigitsException e) {
+                } catch (TooManyDigitsException er) {
                     //Ne fait rien MDR
                     //A quel moment "0" ferait lever cette exception
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                } catch (InterruptedException er) {
+                    er.printStackTrace();
                 }
             }
             device.write(toByteArray(data));
