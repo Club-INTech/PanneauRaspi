@@ -61,7 +61,6 @@ public class Segments {
                     Thread.sleep(1);// je sais pas si c'est utile mais on verra
                     device.write(toByteArray(0x81));
                 } catch (IOException e) {
-                    //System.out.println("Adresse " + String.format("0x%x", displayAddress) + ": aucune réponse"); //Print de debug
                     ++displayAddress;
                     device = null;
                 } catch (TooManyDigitsException e) {
@@ -86,8 +85,6 @@ public class Segments {
      */
     public void write(int data)throws IOException,TooManyDigitsException{
         try{
-            device.write((byte)0x79);
-            device.write((byte)0x00);
             device.write(toByteArray(data));
         }catch (IOException e){
             I2CBus i2CBus=null;
@@ -116,6 +113,9 @@ public class Segments {
                     er.printStackTrace();
                 }
             }
+            device=i2CBus.getDevice(0x71);
+            device.write((byte)0x79);
+            device.write((byte)0x00);
             device.write(toByteArray(data));
 
         }
