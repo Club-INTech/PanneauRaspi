@@ -86,6 +86,8 @@ public class Segments {
      */
     public void write(int data)throws IOException,TooManyDigitsException{
         try{
+            device.write((byte)0x79);
+            device.write((byte)0x00);
             device.write(toByteArray(data));
         }catch (IOException e){
             I2CBus i2CBus=null;
