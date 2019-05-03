@@ -59,7 +59,7 @@ public class Panneau {
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
     public Panneau(Pin LEDRedPin, Pin LEDGreenPin, Pin LEDBluePin, Pin SwitchPin) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        segments=new Segments();
+        segments=new Segments(true);
         led=new LED(LEDRedPin,LEDGreenPin,LEDBluePin, null);
         interrupteur=new Interrupteur(SwitchPin, null);
         if(interrupteur.getState()==PinState.HIGH){

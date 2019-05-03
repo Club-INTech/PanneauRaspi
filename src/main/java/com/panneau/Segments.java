@@ -74,6 +74,7 @@ public class Segments {
         }
         //System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));
         //*/
+        displayAddress=0x71;
         device=i2CBus.getDevice(displayAddress);
     }
 
