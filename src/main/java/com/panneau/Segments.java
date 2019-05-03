@@ -88,7 +88,34 @@ public class Segments {
         try{
             device.write(toByteArray(data));
         }catch (IOException e){
+            I2CBus i2CBus=null;
+            try {
+                //System.out.println("Test sur port "+i);
+                i2CBus = I2CFactory.getInstance(1);
+            } catch (I2CFactory.UnsupportedBusNumberException er) {
+                er.printStackTrace();
+            }
+
+            int displayAddress = 0x03;
+            device = null;
+            while (device == null && displayAddress <= 0x77) {
+                try {
+                    device = i2CBus.getDevice(displayAddress);
+                    Thread.sleep(1);// je sais pas si c'est utile mais on verra
+                    device.write(toByteArray(0x81));
+                } catch (IOException e) {
+                    //System.out.println("Adresse " + String.format("0x%x", displayAddress) + ": aucune réponse"); //Print de debug
+                    ++displayAddress;
+                    device = null;
+                } catch (TooManyDigitsException e) {
+                    //Ne fait rien MDR
+                    //A quel moment "0" ferait lever cette exception
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
             device.write(toByteArray(data));
+
         }
     }
 
