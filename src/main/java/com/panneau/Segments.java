@@ -50,26 +50,10 @@ public class Segments {
         if(!scan) {
             i2CBus.getDevice(0x00).write((byte) 0x81); //envoie "factory reset" sur le broadcast
         }
-        int displayAddress=0x71;
+        int displayAddress;
         //*
         if(scan) {
-            displayAddress=0x03;
-            device = null;
-            while (device == null && displayAddress <= 0x77) {
-                try {
-                    device = i2CBus.getDevice(displayAddress);
-                    Thread.sleep(1);// je sais pas si c'est utile mais on verra
-                    device.write(toByteArray(0x81));
-                } catch (IOException e) {
-                    ++displayAddress;
-                    device = null;
-                } catch (TooManyDigitsException e) {
-                    //Ne fait rien MDR
-                    //A quel moment "0" ferait lever cette exception
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
+            factoryReset(i2CBus);
         }
         //System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));
         //*/
@@ -97,24 +81,8 @@ public class Segments {
                 er.printStackTrace();
             }
 
-            int displayAddress = 0x03;
-            device = null;
-            while (device == null && displayAddress <= 0x77) {
-                try {
-                    device = i2CBus.getDevice(displayAddress);
-                    Thread.sleep(1);// je sais pas si c'est utile mais on verra
-                    device.write(toByteArray(0x81));
-                } catch (IOException er) {
-                    //System.out.println("Adresse " + String.format("0x%x", displayAddress) + ": aucune réponse"); //Print de debug
-                    ++displayAddress;
-                    device = null;
-                } catch (TooManyDigitsException er) {
-                    //Ne fait rien MDR
-                    //A quel moment "0" ferait lever cette exception
-                } catch (InterruptedException er) {
-                    er.printStackTrace();
-                }
-            }
+            factoryReset(i2CBus);
+
             device=i2CBus.getDevice(0x71);
             device.write((byte)0x79);
             device.write((byte)0x00);
@@ -135,5 +103,25 @@ public class Segments {
             throw new TooManyDigitsException((int)Math.log(tmp)+1, this.maxDigits);
         }
         return buff;
+    }
+
+    private void factoryReset(I2CBus i2CBus){
+        int displayAddress=0x03;
+        device = null;
+        while (device == null && displayAddress <= 0x77) {
+            try {
+                device = i2CBus.getDevice(displayAddress);
+                Thread.sleep(1);// je sais pas si c'est utile mais on verra
+                device.write(toByteArray(0x81));
+            } catch (IOException e) {
+                ++displayAddress;
+                device = null;
+            } catch (TooManyDigitsException e) {
+                //Ne fait rien MDR
+                //A quel moment "0" ferait lever cette exception
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
     }
 }
