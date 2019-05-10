@@ -28,8 +28,8 @@ public class Segments {
     /**
      * Initialise le bus I2C et crée une instance de Segments
      * @param scan Pour scanner toutes les adresses, sinon envoie "factory reset" au broadcast
-     * @throws IOException
-     * @throws I2CFactory.UnsupportedBusNumberException
+     * @throws IOException En cas d'erreur de communication
+     * @throws I2CFactory.UnsupportedBusNumberException Si le bus utilisé n'est pas supporté
      */
     public Segments(boolean scan) throws IOException, I2CFactory.UnsupportedBusNumberException {
         I2CBus i2CBus=null;
@@ -91,7 +91,7 @@ public class Segments {
         }
     }
 
-    private byte[] toByteArray(int i)throws TooManyDigitsException{
+    private byte[] toByteArray(int i) throws TooManyDigitsException{
         byte[] buff=new byte[4];
         int tmp=i;
         for(int j=1; j<=4; ++j){

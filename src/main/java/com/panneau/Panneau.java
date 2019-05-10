@@ -22,13 +22,13 @@ public class Panneau {
     private Segments segments;
     private LED led;
     private Interrupteur interrupteur;
-    private static teamColor teamColor;
+    private static TeamColor teamColor;
     private List<teamColorChangeListener> listeners;
 
     /**
      * Enumère les deux couleurs d'équipe possibles
      */
-    public enum teamColor {JAUNE, VIOLET;
+    public enum TeamColor {JAUNE, VIOLET;
         @Override
         public String toString() {
             if(this==JAUNE){
@@ -73,45 +73,52 @@ public class Panneau {
         led=new LED(LEDRedPin,LEDGreenPin,LEDBluePin, null);
         interrupteur=new Interrupteur(SwitchPin, null);
         if(interrupteur.getState()==PinState.HIGH){
-            teamColor= Panneau.teamColor.JAUNE;
+            teamColor= TeamColor.JAUNE;
         }else{
-            teamColor= Panneau.teamColor.VIOLET;
+            teamColor= TeamColor.VIOLET;
         }
         listeners=new ArrayList<>();
         interrupteur.addListener(()->{
             //System.out.println("tout va bien");
             if(interrupteur.getState()==PinState.HIGH){
-                teamColor = teamColor.JAUNE;
+                teamColor = TeamColor.JAUNE;
                 led.setColor(LED.RGBColor.JAUNE);
                 for(teamColorChangeListener listener:listeners){
-                    listener.handleTeamColorChangedEvent(Panneau.teamColor.JAUNE);
+                    listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
                 //System.out.println("JAUNE");
             }else{
-                teamColor = teamColor.VIOLET;
+                teamColor = TeamColor.VIOLET;
                 led.setColor(LED.RGBColor.MAGENTA);
                 for(teamColorChangeListener listener:listeners){
-                    listener.handleTeamColorChangedEvent(Panneau.teamColor.VIOLET);
+                    listener.handleTeamColorChangedEvent(Panneau.TeamColor.VIOLET);
                 }
                 //System.out.println("VIOLET");
             }
         });
+
+        if(isYellow()){
+            led.setColor(LED.RGBColor.JAUNE);
+        }else {
+            led.setColor(LED.RGBColor.MAGENTA);
+        }
+
     }
 
     /**
-     * Cette méthode permet de récupérer la teamColor donnée par l'utilisateur
+     * Cette méthode permet de récupérer la TeamColor donnée par l'utilisateur
      * @return vrai si le switch est en position jaune.
      */
     public boolean isYellow(){
-        return teamColor == teamColor.JAUNE;
+        return teamColor == TeamColor.JAUNE;
     }
 
     /**
-     * Cette méthode permet de récupérer la teamColor donnée par l'utilisateur
+     * Cette méthode permet de récupérer la TeamColor donnée par l'utilisateur
      * @return vrai si le switch est en position violette.
      */
     public boolean isViolet(){
-        return teamColor == teamColor.VIOLET;
+        return teamColor == TeamColor.VIOLET;
     }
 
     /**
@@ -125,10 +132,10 @@ public class Panneau {
     }
 
     /**
-     * Permet de connaître l'état de l'interrupteur sous forme de teamColor
-     * @return La teamColor de la position de l'interrupteur
+     * Permet de connaître l'état de l'interrupteur sous forme de TeamColor
+     * @return La TeamColor de la position de l'interrupteur
      */
-    public teamColor getTeamColor(){
+    public TeamColor getTeamColor(){
         return teamColor;
     }
 
@@ -144,6 +151,6 @@ public class Panneau {
      * Cette interface sert à gérer les évènements de changement de la couleur d'équipe.
      */
     public interface teamColorChangeListener{
-        void handleTeamColorChangedEvent(teamColor newColor);
+        void handleTeamColorChangedEvent(TeamColor newColor);
     }
 }
