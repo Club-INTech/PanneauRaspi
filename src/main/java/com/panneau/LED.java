@@ -2,6 +2,7 @@ package com.panneau;
 
 import com.pi4j.io.gpio.*;
 
+import java.io.File;
 import java.io.IOException;
 
 /**
@@ -67,7 +68,8 @@ public class LED {
     public void setColor(RGBColor c){
         if(c==RGBColor.MAGENTA){
             try {
-                Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","100","0","127"});
+                //Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","100","0","127"}, new String[], new File("~/panneauRaspi/"));
+                Process p=Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 ~/panneauRaspi/LED.py 100 0 127"});
                 p.waitFor();
             }catch(Exception e){
                 e.printStackTrace();
@@ -75,7 +77,7 @@ public class LED {
         }
         if(c==RGBColor.JAUNE){
             try {
-                Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","127","90","0"});
+                Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","~/panneauRaspi/LED.py","127","90","0"});
                 p.waitFor();
             }catch(Exception e){
                 e.printStackTrace();
@@ -89,8 +91,6 @@ public class LED {
         boolean r=v%2==1;
         setColor(r, g, b);
     }
-
-    //TODO: en utilisant le PWM on peut passer en 256 nuances
 
     /**
      * Enumère les couleurs possibles pour la LED
