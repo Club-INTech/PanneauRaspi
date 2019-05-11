@@ -51,7 +51,7 @@ public class LED {
             int R = r ? 1 : 0;
             int G = g ? 1 : 0;
             int B = b ? 1 : 0;
-            Runtime.getRuntime().exec("sudo python3 LED.py "+R*100+" "+G*100+" "+B*100);
+            Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py "+R*100+" "+G*100+" "+B*100});
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -69,7 +69,7 @@ public class LED {
         if(c==RGBColor.MAGENTA){
             try {
                 //Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","100","0","127"}, new String[], new File("~/panneauRaspi/"));
-                Process p=Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 ~/panneauRaspi/LED.py 100 0 127"});
+                Process p=Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py 100 0 127"});
                 p.waitFor();
             }catch(Exception e){
                 e.printStackTrace();
@@ -77,7 +77,7 @@ public class LED {
         }
         if(c==RGBColor.JAUNE){
             try {
-                Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","~/panneauRaspi/LED.py","127","90","0"});
+                Process p=Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py 127 90 0"});
                 p.waitFor();
             }catch(Exception e){
                 e.printStackTrace();
