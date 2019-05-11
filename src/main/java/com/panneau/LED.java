@@ -2,6 +2,8 @@ package com.panneau;
 
 import com.pi4j.io.gpio.*;
 
+import java.io.IOException;
+
 /**
  * Cette classe permet de contrôler une LED RGB.
  * @author rene
@@ -23,15 +25,15 @@ public class LED {
      * @param gpio Contrôleur gpio de la raspi. Mettre <code>null</code> s'il n'a pas encore été initialisé.
      */
     public LED(Pin r, Pin g, Pin b, GpioController gpio){
-        if(gpio==null){
-            this.gpio= GpioFactory.getInstance();
-        }else{
-            this.gpio=gpio;
+        Runtime run=Runtime.getRuntime();
+        try{
+            run.exec("sudo python3");
+            run.exec("import board");
+            run.exec("import neopixel");
+            run.exec("pixel=noepixel.NeoPixel(board.D18, 15)");
+        }catch (IOException e){
+            e.printStackTrace();
         }
-        this.gpio.setShutdownOptions(false);
-        this.r=this.gpio.provisionDigitalOutputPin(r, "Led_Red", defaultState);
-        this.g=this.gpio.provisionDigitalOutputPin(g, "Led_Green", defaultState);
-        this.b=this.gpio.provisionDigitalOutputPin(b, "Led_Blue", defaultState);
     }
 
     /**
@@ -41,22 +43,10 @@ public class LED {
      * @param b composante bleue de la nouvelle couleur
      */
     public void setColor(boolean r, boolean g, boolean b){
-        if(r){
-            this.r.high();
-        }else{
-            this.r.low();
-        }
-
-        if(g){
-            this.g.high();
-        }else{
-            this.g.low();
-        }
-
-        if(b){
-            this.b.high();
-        }else{
-            this.b.low();
+        try {
+            Runtime.getRuntime().exec("pixel.fill(("+r+","+g+","+b+"))");
+        }catch (Exception e){
+            e.printStackTrace();
         }
     }
 
