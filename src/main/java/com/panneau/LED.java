@@ -65,6 +65,22 @@ public class LED {
      * @param c La nouvelle couleur à afficher
      */
     public void setColor(RGBColor c){
+        if(c==RGBColor.MAGENTA){
+            try {
+                Runtime.getRuntime().exec("sudo python3 LED.py 100 0 127");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return;
+        }
+        if(c==RGBColor.JAUNE){
+            try {
+                Runtime.getRuntime().exec("sudo python3 LED.py 127 90 0");
+            }catch(Exception e){
+                e.printStackTrace();
+            }
+            return;
+        }
         int v=c.value;
         boolean b=v%2==1;
         v/=2;
