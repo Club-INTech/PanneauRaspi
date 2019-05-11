@@ -69,7 +69,13 @@ public class LED {
      * @param c La nouvelle couleur à afficher
      */
     public void setColor(RGBColor c){
-        setColor(c.value/4>0, c.value/2%2>0, c.value%4>0);
+        int v=c.value;
+        boolean b=v%2==1;
+        v/=2;
+        boolean g=v%2==1;
+        v/=2;
+        boolean r=v%2==1;
+        setColor(r, g, b);
     }
 
     //TODO: en utilisant le PWM on peut passer en 256 nuances
