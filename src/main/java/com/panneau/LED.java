@@ -1,6 +1,7 @@
 package com.panneau;
 
 import com.pi4j.io.gpio.*;
+import sun.rmi.runtime.Log;
 
 /**
  * Cette classe permet de contrôler une LED RGB.
@@ -58,8 +59,7 @@ public class LED {
         }else{
             this.b.low();
         }
-
-        System.out.println(r+" "+g+" "+b);
+        System.err.println("Couleur"+r+" "+g+" "+b);
     }
 
     public GpioController getGpioController(){
