@@ -58,6 +58,8 @@ public class LED {
         }else{
             this.b.low();
         }
+
+        System.out.println(r+" "+g+" "+b);
     }
 
     public GpioController getGpioController(){
