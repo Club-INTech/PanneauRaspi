@@ -44,7 +44,10 @@ public class LED {
      */
     public void setColor(boolean r, boolean g, boolean b){
         try {
-            Runtime.getRuntime().exec("pixel.fill(("+r+","+g+","+b+"))");
+            int R = r ? 1 : 0;
+            int G = g ? 1 : 0;
+            int B = b ? 1 : 0;
+            Runtime.getRuntime().exec("pixel.fill(("+R*100+","+G*100+","+B*100+"))");
         }catch (Exception e){
             e.printStackTrace();
         }
