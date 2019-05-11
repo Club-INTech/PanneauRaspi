@@ -86,14 +86,14 @@ public class Panneau {
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
-                //System.out.println("JAUNE");
+                System.out.println("JAUNE");
             }else{
                 teamColor = TeamColor.VIOLET;
                 led.setColor(LED.RGBColor.MAGENTA);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.VIOLET);
                 }
-                //System.out.println("VIOLET");
+                System.out.println("VIOLET");
             }
         });
 

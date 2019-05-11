@@ -67,19 +67,19 @@ public class LED {
     public void setColor(RGBColor c){
         if(c==RGBColor.MAGENTA){
             try {
-                Runtime.getRuntime().exec("sudo python3 LED.py 100 0 127");
+                Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","100","0","127"});
+                p.waitFor();
             }catch(Exception e){
                 e.printStackTrace();
             }
-            return;
         }
         if(c==RGBColor.JAUNE){
             try {
-                Runtime.getRuntime().exec("sudo python3 LED.py 127 90 0");
+                Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","127","90","0"});
+                p.waitFor();
             }catch(Exception e){
                 e.printStackTrace();
             }
-            return;
         }
         int v=c.value;
         boolean b=v%2==1;
