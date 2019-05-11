@@ -89,7 +89,7 @@ public class LED {
         boolean g=v%2==1;
         v/=2;
         boolean r=v%2==1;
-        setColor(r, g, b);
+        //setColor(r, g, b);
     }
 
     /**
