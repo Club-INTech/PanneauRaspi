@@ -69,14 +69,14 @@ public class LED {
         if(c==RGBColor.MAGENTA){
             try {
                 //Process p=Runtime.getRuntime().exec(new String[]{"sudo","python3","LED.py","100","0","127"}, new String[], new File("~/panneauRaspi/"));
-                //Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py 100 0 127"});
+                Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py 100 0 127"});
             }catch(Exception e){
                 e.printStackTrace();
             }
         }
         if(c==RGBColor.JAUNE){
             try {
-                //Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py 127 90 0"});
+                Runtime.getRuntime().exec(new String[]{"/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py 127 90 0"});
             }catch(Exception e){
                 e.printStackTrace();
             }
