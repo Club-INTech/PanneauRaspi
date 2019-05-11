@@ -25,15 +25,18 @@ public class LED {
      * @param gpio Contrôleur gpio de la raspi. Mettre <code>null</code> s'il n'a pas encore été initialisé.
      */
     public LED(Pin r, Pin g, Pin b, GpioController gpio){
+        /*
         Runtime run=Runtime.getRuntime();
         try{
             run.exec("sudo python3");
             run.exec("import board");
             run.exec("import neopixel");
             run.exec("pixel=noepixel.NeoPixel(board.D18, 15)");
+
         }catch (IOException e){
             e.printStackTrace();
         }
+         */
     }
 
     /**
@@ -47,7 +50,7 @@ public class LED {
             int R = r ? 1 : 0;
             int G = g ? 1 : 0;
             int B = b ? 1 : 0;
-            Runtime.getRuntime().exec("pixel.fill(("+R*100+","+G*100+","+B*100+"))");
+            Runtime.getRuntime().exec("sudo python3 LED.py "+R*100+" "+G*100+" "+B*100);
         }catch (Exception e){
             e.printStackTrace();
         }
@@ -62,7 +65,13 @@ public class LED {
      * @param c La nouvelle couleur à afficher
      */
     public void setColor(RGBColor c){
-        setColor(c.value/4>0, c.value/2%2>0, c.value%4>0);
+        int v=c.value;
+        boolean b=v%2==1;
+        v/=2;
+        boolean g=v%2==1;
+        v/=2;
+        boolean r=v%2==1;
+        setColor(r, g, b);
     }
 
     //TODO: en utilisant le PWM on peut passer en 256 nuances
