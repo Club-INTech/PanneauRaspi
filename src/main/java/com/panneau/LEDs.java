@@ -54,7 +54,7 @@ public class LEDs {
             });
             while(!initiated) {
                 try {
-                    socket = new Socket("127.0.0.1", programPort);
+                    socket = new Socket("localhost", programPort);
                     output = new PrintStream(socket.getOutputStream(), true);
                 } catch (IOException e) {
                     System.err.println("Echec de la connexion au process, réessai dans 0.5s: ");
