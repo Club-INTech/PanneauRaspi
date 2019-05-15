@@ -20,8 +20,8 @@ public class RaspiExample {
                 if(f >= 1f) {
                     f = 0f;
                 }
-                f += 0.1f;
-                Thread.sleep(100);
+                f += 0.01f;
+                Thread.sleep(10);
             } catch (Exception e) {
             }
         }
