@@ -34,7 +34,7 @@ public class LEDs {
         if(initiated) {
             return;
         }
-        ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED.py", String.valueOf(programPort), String.valueOf(ledCount));
+        ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED/LED.py", String.valueOf(programPort), String.valueOf(ledCount));
         try {
             Process process = builder.start();
             socket = new Socket("127.0.0.1", programPort);
