@@ -13,8 +13,17 @@ public class RaspiExample {
         panel.printScore(i);
         panel.addListener(newColor -> System.out.println(newColor));
         System.out.println(panel.getTeamColor());
+        float f = 0f;
         while (true){
-            try{Thread.sleep(1000);}catch (Exception e){}
+            try {
+                panel.getLeds().fillColor(new LEDs.RGBColor(f, f, f));
+                if(f >= 1f) {
+                    f = 0f;
+                }
+                f += 0.1f;
+                Thread.sleep(10);
+            } catch (Exception e) {
+            }
         }
 
     }
