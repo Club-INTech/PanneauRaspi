@@ -18,6 +18,7 @@ public class RaspiExample {
         while (true){
             try {
                 panel.getLeds().set(index, new LEDs.RGBColor(f % 1f, (f+1f/3f) % 1f, (f+2f/3f) % 1f));
+                panel.getLeds().update();
                 index++;
                 index %= 16;
                 f += 0.1f;

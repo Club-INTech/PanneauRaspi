@@ -83,6 +83,7 @@ public class Panneau {
             if(interrupteur.getState()==PinState.HIGH){
                 teamColor = TeamColor.JAUNE;
                 leds.fillColor(LEDs.RGBColor.JAUNE);
+                leds.update();
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
@@ -90,6 +91,7 @@ public class Panneau {
             }else{
                 teamColor = TeamColor.VIOLET;
                 leds.fillColor(LEDs.RGBColor.MAGENTA);
+                leds.update();
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.VIOLET);
                 }
@@ -99,8 +101,10 @@ public class Panneau {
 
         if(isYellow()){
             leds.fillColor(LEDs.RGBColor.JAUNE);
+            leds.update();
         }else {
             leds.fillColor(LEDs.RGBColor.MAGENTA);
+            leds.update();
         }
 
     }

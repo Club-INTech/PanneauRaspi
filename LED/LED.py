@@ -6,7 +6,7 @@ import socket
 # sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 port = int(sys.argv[1])
 ledCount = int(sys.argv[2])
-pixels = neopixel.NeoPixel(board.D18, ledCount)
+pixels = neopixel.NeoPixel(board.D18, ledCount, auto_write=False)
 
 # led server
 connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -49,5 +49,7 @@ while True:
 					b = int(255*float(args[4]))
 					for index in range(start, end+1):
 						pixels[index] = ((r, g, b))
+			elif command == "update":
+				pixels.show()
 		except Exception as e:
 			print(e)
