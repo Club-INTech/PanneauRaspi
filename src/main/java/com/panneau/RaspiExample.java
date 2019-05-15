@@ -21,7 +21,7 @@ public class RaspiExample {
                     f = 0f;
                 }
                 f += 0.01f;
-                Thread.sleep(10);
+                Thread.sleep(50);
             } catch (Exception e) {
             }
         }
