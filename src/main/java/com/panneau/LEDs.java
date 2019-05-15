@@ -35,7 +35,7 @@ public class LEDs {
         if(initiated) {
             return;
         }
-        ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED/LED.py", String.valueOf(programPort), String.valueOf(ledCount));
+        ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo", "python3", "/home/pi/panneauRaspi/LED/LED.py", String.valueOf(programPort), String.valueOf(ledCount));
         try {
             Process process = builder.start();
             Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -65,11 +65,11 @@ public class LEDs {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
+                initiated = true;
             }
         } catch (IOException e) {
             e.printStackTrace();
         }
-        initiated = true;
     }
 
     /**
