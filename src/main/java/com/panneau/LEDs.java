@@ -105,11 +105,6 @@ public class LEDs {
         sendCommand("set", index, c.getRed(), c.getGreen(), c.getBlue());
     }
 
-    public void update() {
-        ensureInitiated();
-        sendCommand("update");
-    }
-
     /**
      * Envoie une commande au programme qui gère les LEDs
      * @param parameters
