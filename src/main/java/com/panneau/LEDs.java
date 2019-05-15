@@ -117,7 +117,7 @@ public class LEDs {
         private final float green;
         private final float blue;
 
-        RGBColor(float red, float green, float blue) {
+        public RGBColor(float red, float green, float blue) {
             this.red = red;
             this.green = green;
             this.blue = blue;
