@@ -19,10 +19,12 @@ while True:
 		try:
 			data = client.recv(1024)
 			if not data:
-				break;
+				break
 			message = data.decode('utf-8')
 			print("Received: ", message)
 			parts = message.split()
+			if len(parts) == 0:
+				continue
 			command = parts[0]
 			args = parts[1:]
 			if command == "fill":
