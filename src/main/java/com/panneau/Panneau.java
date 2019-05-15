@@ -105,6 +105,10 @@ public class Panneau {
 
     }
 
+    public LEDs getLeds() {
+        return leds;
+    }
+
     /**
      * Cette méthode permet de récupérer la TeamColor donnée par l'utilisateur
      * @return vrai si le switch est en position jaune.

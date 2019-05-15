@@ -67,6 +67,27 @@ public class LEDs {
     }
 
     /**
+     * Remplit une bande de LEDs
+     * @param start la première led
+     * @param end la dernière led (incluse)
+     * @param c la couleur à appliquer
+     */
+    public void fillRange(int start, int end, RGBColor c) {
+        ensureInitiated();
+        sendCommand("range", start, end, c.getRed(), c.getGreen(), c.getBlue());
+    }
+
+    /**
+     * Set la couleur d'une seule led
+     * @param index l'indice de la LED
+     * @param c la couleur à appliquer
+     */
+    public void set(int index, RGBColor c) {
+        ensureInitiated();
+        sendCommand("set", index, c.getRed(), c.getGreen(), c.getBlue());
+    }
+
+    /**
      * Envoie une commande au programme qui gère les LEDs
      * @param parameters
      */
