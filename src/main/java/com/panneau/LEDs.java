@@ -37,6 +37,7 @@ public class LEDs {
         }
         ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo", "python3", "/home/pi/panneauRaspi/LED/LED.py", String.valueOf(programPort), String.valueOf(ledCount));
         try {
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             Process process = builder.start();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
@@ -56,16 +57,18 @@ public class LEDs {
                 try {
                     socket = new Socket("localhost", programPort);
                     output = new PrintStream(socket.getOutputStream(), true);
+                    initiated = true;
                 } catch (IOException e) {
                     System.err.println("Echec de la connexion au process, réessai dans 0.5s: ");
                     e.printStackTrace();
                 }
-                try {
-                    TimeUnit.MILLISECONDS.sleep(500);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
+                if(!initiated) {
+                    try {
+                        TimeUnit.MILLISECONDS.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                 }
-                initiated = true;
             }
         } catch (IOException e) {
             e.printStackTrace();
