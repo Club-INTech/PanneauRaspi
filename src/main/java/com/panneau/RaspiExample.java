@@ -16,7 +16,7 @@ public class RaspiExample {
         float f = 0f;
         while (true){
             try {
-                panel.getLeds().fillColor(new LEDs.RGBColor(f, (f+1f/3f) % 1f, (f+2f/3f) % 1f));
+                panel.getLeds().fillColor(new LEDs.RGBColor(f % 1f, (f+1f/3f) % 1f, (f+2f/3f) % 1f));
                 f += 0.01f;
                 Thread.sleep(50);
             } catch (Exception e) {
