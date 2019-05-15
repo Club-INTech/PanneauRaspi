@@ -3,6 +3,7 @@ package com.panneau;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Cette classe permet de contrôler les LEDs RGB.
@@ -37,20 +38,34 @@ public class LEDs {
         ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED/LED.py", String.valueOf(programPort), String.valueOf(ledCount));
         try {
             Process process = builder.start();
-            socket = new Socket("127.0.0.1", programPort);
-            output = new PrintStream(socket.getOutputStream(), true);
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
                 public void run() {
                     super.run();
                     process.destroyForcibly();
                     try {
-                        socket.close();
+                        if(socket != null) {
+                            socket.close();
+                        }
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
                 }
             });
+            while(!initiated) {
+                try {
+                    socket = new Socket("127.0.0.1", programPort);
+                    output = new PrintStream(socket.getOutputStream(), true);
+                } catch (IOException e) {
+                    System.err.println("Echec de la connexion au process, réessai dans 0.5s: ");
+                    e.printStackTrace();
+                }
+                try {
+                    TimeUnit.MILLISECONDS.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }
