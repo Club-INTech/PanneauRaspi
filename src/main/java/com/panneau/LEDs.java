@@ -37,7 +37,7 @@ public class LEDs {
         }
         ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED/LED.py " + programPort + " " + ledCount);
         try {
-          //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             Process process = builder.start();
             Runtime.getRuntime().addShutdownHook(new Thread() {
                 @Override
