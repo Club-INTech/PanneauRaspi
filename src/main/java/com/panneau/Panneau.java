@@ -20,7 +20,7 @@ import java.util.List;
  */
 public class Panneau {
     private Segments segments;
-    private LED led;
+    private LEDs leds;
     private Interrupteur interrupteur;
     private static TeamColor teamColor;
     private List<teamColorChangeListener> listeners;
@@ -44,16 +44,16 @@ public class Panneau {
      * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
      * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
      */
-    public Panneau(boolean useSegments)throws IOException, I2CFactory.UnsupportedBusNumberException {
-        this(RaspiPin.GPIO_04, RaspiPin.GPIO_02, RaspiPin.GPIO_03, RaspiPin.GPIO_07, useSegments);
+    public Panneau(int ledCount, int programPort, boolean useSegments)throws IOException, I2CFactory.UnsupportedBusNumberException {
+        this(ledCount, programPort, RaspiPin.GPIO_07, useSegments);
     }
 
-    public  Panneau()throws  IOException, I2CFactory.UnsupportedBusNumberException{
-        this(true);
+    public  Panneau(int ledCount, int programPort) throws  IOException, I2CFactory.UnsupportedBusNumberException{
+        this(ledCount, programPort, true);
     }
 
-    public Panneau(Pin LEDRedPin, Pin LEDGreenPin, Pin LEDBluePin, Pin SwitchPin) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        this(RaspiPin.GPIO_04, RaspiPin.GPIO_02, RaspiPin.GPIO_03, RaspiPin.GPIO_07, true);
+    public Panneau(int ledCount, int programPort, Pin SwitchPin) throws IOException, I2CFactory.UnsupportedBusNumberException {
+        this(ledCount, programPort, SwitchPin, true);
     }
 
         /**
@@ -66,11 +66,11 @@ public class Panneau {
          * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
          * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
          */
-    public Panneau(Pin LEDRedPin, Pin LEDGreenPin, Pin LEDBluePin, Pin SwitchPin, boolean useSegments) throws IOException, I2CFactory.UnsupportedBusNumberException {
+    public Panneau(int ledCount, int programPort, Pin SwitchPin, boolean useSegments) throws IOException, I2CFactory.UnsupportedBusNumberException {
         if(useSegments){
             segments=new Segments(true);
         }
-        led=new LED(LEDRedPin,LEDGreenPin,LEDBluePin, null);
+        leds =new LEDs(ledCount, programPort);
         interrupteur=new Interrupteur(SwitchPin, null);
         if(interrupteur.getState()==PinState.HIGH){
             teamColor= TeamColor.JAUNE;
@@ -82,14 +82,14 @@ public class Panneau {
             //System.out.println("tout va bien");
             if(interrupteur.getState()==PinState.HIGH){
                 teamColor = TeamColor.JAUNE;
-                led.setColor(LED.RGBColor.JAUNE);
+                leds.fillColor(LEDs.RGBColor.JAUNE);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
                 System.out.println("JAUNE");
             }else{
                 teamColor = TeamColor.VIOLET;
-                led.setColor(LED.RGBColor.MAGENTA);
+                leds.fillColor(LEDs.RGBColor.MAGENTA);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.VIOLET);
                 }
@@ -98,9 +98,9 @@ public class Panneau {
         });
 
         if(isYellow()){
-            led.setColor(LED.RGBColor.JAUNE);
+            leds.fillColor(LEDs.RGBColor.JAUNE);
         }else {
-            led.setColor(LED.RGBColor.MAGENTA);
+            leds.fillColor(LEDs.RGBColor.MAGENTA);
         }
 
     }
