@@ -13,7 +13,7 @@ connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connection.bind(('', port))
 connection.listen(5)
 
-client, info = connexion_principale.accept()
+client, info = connection.accept()
 while True:
 	try:
 		message = str(client.recv(1024))
