@@ -103,15 +103,15 @@ public class LEDs {
     /**
      * Enumère les couleurs possibles pour la LED
      */
-    public enum RGBColor {
-        ROUGE(1,0,0),
-        VERT(0,1,0),
-        BLEU(0,0,1),
-        JAUNE(1,1,0),
-        CYAN(0,1,1),
-        MAGENTA(1,0,1),
-        NOIR(0,0,0),
-        BLANC(1,1,1);
+    public static class RGBColor {
+        public static final RGBColor ROUGE = new RGBColor(1,0,0);
+        public static final RGBColor VERT = new RGBColor(0,1,0);
+        public static final RGBColor BLEU = new RGBColor(0,0,1);
+        public static final RGBColor JAUNE = new RGBColor(1,1,0);
+        public static final RGBColor CYAN = new RGBColor(0,1,1);
+        public static final RGBColor MAGENTA = new RGBColor(1,0,1);
+        public static final RGBColor NOIR = new RGBColor(0,0,0);
+        public static final RGBColor BLANC = new RGBColor(1,1,1);
 
         private final float red;
         private final float green;
@@ -137,7 +137,7 @@ public class LEDs {
 
         @Override
         public String toString() {
-            return name();
+            return red+" "+green+" "+blue;
         }
     }
 }
