@@ -6,7 +6,7 @@ import socket
 # sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 port = int(sys.argv[1])
 ledCount = int(sys.argv[2])
-pixels = neopixel.NeoPixel(board.D18, ledCount, auto_write=False)
+pixels = neopixel.NeoPixel(board.D18, ledCount, brightness=0.1)
 
 # led server
 connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
