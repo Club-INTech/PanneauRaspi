@@ -19,6 +19,7 @@ public class LEDs {
     private Socket socket;
     private PrintStream output;
     private StringBuilder builder = new StringBuilder();
+    private boolean triedToLaunch;
 
     /**
      * Construit une instance de LEDs
@@ -35,43 +36,40 @@ public class LEDs {
         if(initiated) {
             return;
         }
-        ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED/LED.py " + programPort + " " + ledCount);
-        try {
-          //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
-            Process process = builder.start();
-            Runtime.getRuntime().addShutdownHook(new Thread() {
-                @Override
-                public void run() {
-                    super.run();
-                    process.destroyForcibly();
-                    try {
-                        if(socket != null) {
-                            socket.close();
+        if( ! triedToLaunch) {
+            ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/pi/panneauRaspi/LED/LED.py " + programPort + " " + ledCount);
+            //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            try {
+                Process process = builder.start();
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        process.destroyForcibly();
+                        try {
+                            if(socket != null) {
+                                socket.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
                         }
-                    } catch (IOException e) {
-                        e.printStackTrace();
                     }
-                }
-            });
-            while(!initiated) {
-                try {
-                    socket = new Socket("localhost", programPort);
-                    output = new PrintStream(socket.getOutputStream(), true);
-                    initiated = true;
-                } catch (IOException e) {
-                    System.err.println("Echec de la connexion au process, réessai dans 0.5s: ");
-                    e.printStackTrace();
-                }
-                if(!initiated) {
-                    try {
-                        TimeUnit.MILLISECONDS.sleep(500);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
+                });
+                triedToLaunch = true;
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+
+        }
+        if(!initiated) {
+            try {
+                socket = new Socket("localhost", programPort);
+                output = new PrintStream(socket.getOutputStream(), true);
+                initiated = true;
+            } catch (IOException e) {
+                System.err.println("Echec de la connexion au process, réessai plus tard...");
+                e.printStackTrace();
+            }
         }
     }
 
