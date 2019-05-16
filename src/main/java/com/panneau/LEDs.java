@@ -112,8 +112,10 @@ public class LEDs {
         for(Object obj : parameters) {
             builder.append(obj).append(" ");
         }
-        output.println(builder.toString());
-        output.flush();
+        if(output != null) {
+            output.println(builder.toString());
+            output.flush();
+        }
     }
 
     /**
