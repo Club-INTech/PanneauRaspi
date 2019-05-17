@@ -82,14 +82,14 @@ public class Panneau {
             //System.out.println("tout va bien");
             if(interrupteur.getState()==PinState.HIGH){
                 teamColor = TeamColor.JAUNE;
-                leds.fillColor(LEDs.RGBColor.JAUNE);
+                leds.fillColor(LEDs.RGBColor.JauneNeopixel);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
                 System.out.println("JAUNE");
             }else{
                 teamColor = TeamColor.VIOLET;
-                leds.fillColor(LEDs.RGBColor.MAGENTA);
+                leds.fillColor(LEDs.RGBColor.VioletNeopixel);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.VIOLET);
                 }
