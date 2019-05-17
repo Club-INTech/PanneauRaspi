@@ -130,6 +130,8 @@ public class LEDs {
         public static final RGBColor MAGENTA = new RGBColor(1,0,1);
         public static final RGBColor NOIR = new RGBColor(0,0,0);
         public static final RGBColor BLANC = new RGBColor(1,1,1);
+        public static final RGBColor JauneNeopixel = new RGBColor(1, (float)0.8, 0);
+        public static final RGBColor VioletNeopixel = new RGBColor((float).8, 0, 1);
 
         private final float red;
         private final float green;
