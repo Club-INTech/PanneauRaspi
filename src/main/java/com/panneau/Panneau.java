@@ -132,6 +132,10 @@ public class Panneau {
      * @throws TooManyDigitsException Si le nombre à afficher est trop grand
      */
     public void printScore(int score) throws IOException,TooManyDigitsException{
+        if(segments==null){
+            System.err.println("niktamer");
+            return;
+        }
         segments.write(score);
     }
 
