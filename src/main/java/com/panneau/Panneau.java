@@ -133,7 +133,7 @@ public class Panneau {
      */
     public void printScore(int score) throws IOException,TooManyDigitsException{
         if(segments==null){
-            System.err.println("niktamer");
+            System.err.println("niktamer NPE");
             return;
         }
         segments.write(score);
