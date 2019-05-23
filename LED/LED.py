@@ -7,6 +7,7 @@ import signal as sgl
 
 def terminate(signalNumber, frame):
 	pixels.fill((0, 0, 0))
+	pixels.deinit()
 	exit(0)
 
 
