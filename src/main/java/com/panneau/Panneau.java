@@ -58,9 +58,6 @@ public class Panneau {
 
         /**
          * Crée une instance de panneau en spécifiant les pins à utiliser.
-         * @param LEDRedPin Pin reliée à la cathode rouge
-         * @param LEDGreenPin pin reliée à la cathode verte
-         * @param LEDBluePin pin reliée à la cathode bleue
          * @param SwitchPin pin en pullup reliée à l'intterrupteur
          * @throws I2CFactory.UnsupportedBusNumberException Cette exception est levée si
          * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
@@ -133,7 +130,7 @@ public class Panneau {
      */
     public void printScore(int score) throws IOException,TooManyDigitsException{
         if(segments==null){
-            System.err.println("niktamer NPE");
+            System.err.println("Je ne peux pas afficher de score sans afficheur!");
             return;
         }
         segments.write(score);
