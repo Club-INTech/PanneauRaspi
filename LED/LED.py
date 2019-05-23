@@ -48,7 +48,7 @@ while True:
 					r = int(255*float(args[1]))
 					g = int(255*float(args[2]))
 					b = int(255*float(args[3]))
-					pixels[index] = ((r, g, b))
+					pixels[index] = (r, g, b)
 			elif command == "range":
 				if len(args) == 5:
 					start = int(args[0])
@@ -57,7 +57,7 @@ while True:
 					g = int(255*float(args[3]))
 					b = int(255*float(args[4]))
 					for index in range(start, end+1):
-						pixels[index] = ((r, g, b))
+						pixels[index] = (r, g, b)
 			elif command == "update":
 				pixels.show()
 		except Exception as e:
