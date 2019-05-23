@@ -2,6 +2,13 @@ import sys
 import board
 import neopixel
 import socket
+import signal as sgl
+
+
+def terminate(signalNumber, frame):
+	pixels.fill((0, 0, 0))
+	exit(0)
+
 
 # sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 port = int(sys.argv[1])
@@ -12,6 +19,8 @@ pixels = neopixel.NeoPixel(board.D18, ledCount, brightness=0.1)
 connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 connection.bind(('', port))
 connection.listen(5)
+
+sgl.signal(sgl.SIGTERM, terminate)
 
 while True:
 	client, info = connection.accept()
