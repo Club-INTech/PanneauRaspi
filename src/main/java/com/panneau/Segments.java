@@ -47,22 +47,24 @@ class Segments {
                 throw new I2CFactory.UnsupportedBusNumberException();
             }
         }
-        if(!scan) {
-            i2CBus.getDevice(0x00).write((byte) 0x81); //envoie "factory reset" sur le broadcast
-        }
-        int displayAddress;
-        //*
-        if(scan) {
-            factoryReset(i2CBus);
-        }
-        //System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));
-        //*/
-        displayAddress=0x71;
-        device=i2CBus.getDevice(displayAddress);
         try{
-            write(37);
-        }catch (Exception e){
-            e.printStackTrace();
+            device=i2CBus.getDevice(0x71);
+            try{
+                write(37);
+            }catch (TooManyDigitsException er){
+                //NTM ya ke 2 digits
+            }
+        }catch (IOException e) {
+            if (!scan) {
+                i2CBus.getDevice(0x00).write((byte) 0x81); //envoie "factory reset" sur le broadcast
+            }
+            //*
+            if (scan) {
+                factoryReset(i2CBus);
+            }
+            //System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));
+            //*/
+            device = i2CBus.getDevice(0x71);
         }
     }
 
