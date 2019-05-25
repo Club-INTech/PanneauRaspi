@@ -17,7 +17,7 @@ import java.io.IOException;
 public class Segments {
     private I2CDevice device;
     final private int maxDigits=4;
-
+    private static int errorsCount=0;
     /**
      * Initialise le bus I2C et crée une instance de Segments en envoyant un factory reset sur le broadcast
      */
@@ -78,18 +78,22 @@ public class Segments {
             device.write(0x79, (byte)0x00);
             device.write(toByteArray(data));
         }catch (IOException e){
-            I2CBus i2CBus=null;
-            try {
-                //System.out.println("Test sur port "+i);
-                i2CBus = I2CFactory.getInstance(1);
-                factoryReset(i2CBus);
+            ++errorsCount;
+            if(errorsCount>=5) {
+                I2CBus i2CBus = null;
+                try {
+                    //System.out.println("Test sur port "+i);
+                    i2CBus = I2CFactory.getInstance(1);
+                    factoryReset(i2CBus);
 
-                device=i2CBus.getDevice(0x71);
-                //device.write((byte)0x79);
-                device.write(0x79, (byte)0x00);
-                device.write(toByteArray(data));
-            } catch (I2CFactory.UnsupportedBusNumberException er) {
-                er.printStackTrace();
+                    device = i2CBus.getDevice(0x71);
+                    //device.write((byte)0x79);
+                    device.write(0x79, (byte) 0x00);
+                    device.write(toByteArray(data));
+                } catch (I2CFactory.UnsupportedBusNumberException er) {
+                    er.printStackTrace();
+                }
+                errorsCount=0;
             }
 
         }
