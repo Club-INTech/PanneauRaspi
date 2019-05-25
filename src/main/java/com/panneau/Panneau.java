@@ -130,7 +130,7 @@ public class Panneau {
      */
     public void printScore(int score) throws IOException,TooManyDigitsException{
         if(segments==null){
-            System.err.println("Je ne peux pas afficher de score sans afficheur!");
+            System.err.println("Grâce à @rene il n'y a plus de NPE ici, mais arrêtez d'essayer d'afficher du score sur le secondaire svp.");
             return;
         }
         segments.write(score);
