@@ -82,16 +82,15 @@ public class Segments {
             try {
                 //System.out.println("Test sur port "+i);
                 i2CBus = I2CFactory.getInstance(1);
+                factoryReset(i2CBus);
+
+                device=i2CBus.getDevice(0x71);
+                device.write((byte)0x79);
+                device.write((byte)0x00);
+                device.write(toByteArray(data));
             } catch (I2CFactory.UnsupportedBusNumberException er) {
                 er.printStackTrace();
             }
-
-            factoryReset(i2CBus);
-
-            device=i2CBus.getDevice(0x71);
-            device.write((byte)0x79);
-            device.write((byte)0x00);
-            device.write(toByteArray(data));
 
         }
     }
@@ -111,17 +110,11 @@ public class Segments {
     }
 
     private void factoryReset(I2CBus i2CBus){
-        int displayAddress=0x03;
-        device = null;
-        while (device == null && displayAddress <= 0x77) {
+        for( int displayAddress=0x03; displayAddress<=0x77; ++displayAddress)
+        {
             try {
-                device = i2CBus.getDevice(displayAddress);
-                Thread.sleep(1);// je sais pas si c'est utile mais on verra
-                device.write((byte)0x81);
-            } catch (IOException e) {
-                ++displayAddress;
-                device = null;
-            } catch (InterruptedException e) {
+                i2CBus.getDevice(displayAddress).write((byte)0x81);
+            }catch (IOException e){
                 e.printStackTrace();
             }
         }
