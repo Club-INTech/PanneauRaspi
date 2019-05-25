@@ -94,7 +94,6 @@ class Segments {
                 } catch (I2CFactory.UnsupportedBusNumberException er) {
                     er.printStackTrace();
                 }
-                errorsCount=0;
             }
 
         }
@@ -127,6 +126,7 @@ class Segments {
                 for (int displayAddress = 0x03; displayAddress <= 0x77; ++displayAddress) {
                     try {
                         i2CBus.getDevice(displayAddress).write((byte) 0x81);
+                        System.out.println("Reset réussi sur l'adresse " + String.format("0x%x", displayAddress));
                     } catch (IOException er) {
                         //print nothing
                     }
