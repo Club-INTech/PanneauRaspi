@@ -46,6 +46,7 @@ public class LEDs {
                     public void run() {
                         super.run();
                         process.destroyForcibly();
+                        fillColor(RGBColor.NOIR);
                         try {
                             if(socket != null) {
                                 socket.close();
