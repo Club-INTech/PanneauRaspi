@@ -110,6 +110,7 @@ public class Segments {
     }
 
     private void factoryReset(I2CBus i2CBus){
+        System.err.println("Factory reset sur le panneau");
         for( int displayAddress=0x03; displayAddress<=0x77; ++displayAddress)
         {
             try {
