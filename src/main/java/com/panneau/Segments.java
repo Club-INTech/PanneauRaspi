@@ -59,6 +59,11 @@ public class Segments {
         //*/
         displayAddress=0x71;
         device=i2CBus.getDevice(displayAddress);
+        try{
+            device.write(toByteArray(37));
+        }catch (Exception e){
+            e.printStackTrace();
+        }
     }
 
     /**
@@ -112,13 +117,10 @@ public class Segments {
             try {
                 device = i2CBus.getDevice(displayAddress);
                 Thread.sleep(1);// je sais pas si c'est utile mais on verra
-                device.write(toByteArray(0x81));
+                device.write((byte)0x81);
             } catch (IOException e) {
                 ++displayAddress;
                 device = null;
-            } catch (TooManyDigitsException e) {
-                //Ne fait rien MDR
-                //A quel moment "0" ferait lever cette exception
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
