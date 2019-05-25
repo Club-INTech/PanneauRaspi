@@ -22,6 +22,7 @@ connection.bind(('', port))
 connection.listen(5)
 
 sgl.signal(sgl.SIGTERM, terminate)
+sgl.signal(sgl.SIGUSR1, terminate)
 
 while True:
 	client, info = connection.accept()
