@@ -4,11 +4,13 @@ import neopixel
 import socket
 import signal as sgl
 import os
+import smbus
 
 
 def terminate(signalNumber, frame):
 	pixels.fill((0, 0, 0))
 	pixels.deinit()
+	smbus.SMBus(0).write_byte(0x71, 0x76)
 	exit(0)
 
 
