@@ -24,7 +24,10 @@ connection.listen(5)
 
 sgl.signal(sgl.SIGTERM, terminate)
 sgl.signal(sgl.SIGUSR1, terminate)
-os.system('sudo echo "' + os.getpid() + '"\n >/home/pi/panneauRaspi/LED/PID')
+PID = open("/hom/pi/panneauRaspi/LED/PID", "w")
+PID.write(str(os.getpid()))
+PID.close()
+# os.system('sudo echo "' + os.getpid() + '"\n >/home/pi/panneauRaspi/LED/PID')
 
 while True:
 	client, info = connection.accept()
