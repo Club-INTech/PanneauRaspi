@@ -160,4 +160,10 @@ public class LEDs {
             return red+" "+green+" "+blue;
         }
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        fillColor(RGBColor.NOIR);
+        super.finalize();
+    }
 }
