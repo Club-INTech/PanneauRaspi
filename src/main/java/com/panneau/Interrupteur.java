@@ -12,7 +12,7 @@ import java.util.List;
  * @version 1.0
  * @since ever
  */
-public class Interrupteur {
+class Interrupteur {
     private GpioController parent;
     private GpioPinDigitalInput pin;
     private PinState state;
@@ -22,7 +22,7 @@ public class Interrupteur {
      * Cette méthode permet d'ajouter un listener attendant un changement de couleur
      * @param listener Inmplémentation de l'interface <code>StateChangeListener</code>
      */
-    public void addListener(StateChangeListener listener){
+    void addListener(StateChangeListener listener){
         listeners.add(listener);
     }
 
@@ -37,7 +37,7 @@ public class Interrupteur {
      * @param pin Pin sur lequel est branché l'interrupteur
      * @param gpio Contôleur gpio de la raspi. Mettre <code>null</code> s'il n'a pas encore été initialisé.
      */
-    public Interrupteur(Pin pin, GpioController gpio){
+    Interrupteur(Pin pin, GpioController gpio){
         if(gpio==null){
             parent= GpioFactory.getInstance();
         }else{
@@ -54,14 +54,14 @@ public class Interrupteur {
      * Permet de récupérer la valeur du pin.
      * @return La valeur du pin
      */
-    public PinState getState(){
+    PinState getState(){
         return state;
     }
 
     /**
      * Interface permettant d'éxécuter du code lors d'un evènement de changement de couleur.
      */
-    public interface StateChangeListener {
+    interface StateChangeListener {
         void handleStateChangedEvent();
     }
 }

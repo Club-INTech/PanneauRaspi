@@ -14,14 +14,14 @@ import java.io.IOException;
  * @since ever
  * @version 1.0
  */
-public class Segments {
+class Segments {
     private I2CDevice device;
     final private int maxDigits=4;
     private static int errorsCount=0;
     /**
      * Initialise le bus I2C et crée une instance de Segments en envoyant un factory reset sur le broadcast
      */
-    public Segments() throws  IOException, I2CFactory.UnsupportedBusNumberException {
+    Segments() throws  IOException, I2CFactory.UnsupportedBusNumberException {
         this(false);
     }
 
@@ -31,7 +31,7 @@ public class Segments {
      * @throws IOException En cas d'erreur de communication
      * @throws I2CFactory.UnsupportedBusNumberException Si le bus utilisé n'est pas supporté
      */
-    public Segments(boolean scan) throws IOException, I2CFactory.UnsupportedBusNumberException {
+    Segments(boolean scan) throws IOException, I2CFactory.UnsupportedBusNumberException {
         I2CBus i2CBus=null;
         //System.out.println("Entre dans le constructeur du 7 segments");
         int i=0;
@@ -72,11 +72,12 @@ public class Segments {
      * @throws IOException Cette exception est levée après deux erreurs de transmission consécutives.
      * @throws TooManyDigitsException Si le nombre à afficher contient plus de 4 chiffres.
      */
-    public void write(int data)throws IOException,TooManyDigitsException{
+    void write(int data)throws IOException,TooManyDigitsException{
         try{
             //device.write((byte)0x79);
             device.write(0x79, (byte)0x00);
             device.write(toByteArray(data));
+            errorsCount=0;
         }catch (IOException e){
             ++errorsCount;
             if(errorsCount>=5) {
@@ -113,17 +114,22 @@ public class Segments {
         return buff;
     }
 
-    private void factoryReset(I2CBus i2CBus){
-        try{
-            i2CBus.getDevice(0x00).write((byte)0x81);
-            device.write((byte)0x81);
-        }catch(IOException e) {
-            System.err.println("Factory reset sur le panneau");
-            for (int displayAddress = 0x03; displayAddress <= 0x77; ++displayAddress) {
-                try {
-                    i2CBus.getDevice(displayAddress).write((byte) 0x81);
-                } catch (IOException er) {
-                    //print nothing
+    private void factoryReset(I2CBus i2CBus) {
+        try {
+            System.err.println("Fatory reset sur le panneau");
+            device.write((byte) 0x81);
+        } catch (IOException err) {
+            try{
+                System.err.println("Factory reset sur le broadcast");
+                i2CBus.getDevice(0x00).write((byte) 0x81);
+            } catch (IOException e) {
+                System.err.println("Factory reset sur toutes les adresses");
+                for (int displayAddress = 0x03; displayAddress <= 0x77; ++displayAddress) {
+                    try {
+                        i2CBus.getDevice(displayAddress).write((byte) 0x81);
+                    } catch (IOException er) {
+                        //print nothing
+                    }
                 }
             }
         }

@@ -66,6 +66,11 @@ public class Panneau {
     public Panneau(int ledCount, int programPort, Pin SwitchPin, boolean useSegments) throws IOException, I2CFactory.UnsupportedBusNumberException {
         if(useSegments){
             segments=new Segments(true);
+            try{
+                segments.write(37);
+            }catch (IOException | TooManyDigitsException e){
+                System.err.println("Erreur d'initialisation du panneau");
+            }
         }
         leds =new LEDs(ledCount, programPort);
         interrupteur=new Interrupteur(SwitchPin, null);
