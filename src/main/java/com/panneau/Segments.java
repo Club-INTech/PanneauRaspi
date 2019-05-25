@@ -60,7 +60,7 @@ public class Segments {
         displayAddress=0x71;
         device=i2CBus.getDevice(displayAddress);
         try{
-            device.write(toByteArray(37));
+            write(37);
         }catch (Exception e){
             e.printStackTrace();
         }
