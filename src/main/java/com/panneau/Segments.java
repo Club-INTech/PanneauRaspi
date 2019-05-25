@@ -74,8 +74,8 @@ public class Segments {
      */
     public void write(int data)throws IOException,TooManyDigitsException{
         try{
-            device.write((byte)0x79);
-            device.write((byte)0x00);
+            //device.write((byte)0x79);
+            device.write(0x79, (byte)0x00);
             device.write(toByteArray(data));
         }catch (IOException e){
             I2CBus i2CBus=null;
@@ -85,8 +85,8 @@ public class Segments {
                 factoryReset(i2CBus);
 
                 device=i2CBus.getDevice(0x71);
-                device.write((byte)0x79);
-                device.write((byte)0x00);
+                //device.write((byte)0x79);
+                device.write(0x79, (byte)0x00);
                 device.write(toByteArray(data));
             } catch (I2CFactory.UnsupportedBusNumberException er) {
                 er.printStackTrace();
@@ -111,12 +111,16 @@ public class Segments {
 
     private void factoryReset(I2CBus i2CBus){
         System.err.println("Factory reset sur le panneau");
-        for( int displayAddress=0x03; displayAddress<=0x77; ++displayAddress)
-        {
-            try {
-                i2CBus.getDevice(displayAddress).write((byte)0x81);
-            }catch (IOException e){
-                //print nothing
+        try{
+            i2CBus.getDevice(0x00).write((byte)0x81);
+            device.write((byte)0x81);
+        }catch(IOException e) {
+            for (int displayAddress = 0x03; displayAddress <= 0x77; ++displayAddress) {
+                try {
+                    i2CBus.getDevice(displayAddress).write((byte) 0x81);
+                } catch (IOException er) {
+                    //print nothing
+                }
             }
         }
     }
