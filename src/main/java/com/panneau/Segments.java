@@ -115,7 +115,7 @@ public class Segments {
             try {
                 i2CBus.getDevice(displayAddress).write((byte)0x81);
             }catch (IOException e){
-                e.printStackTrace();
+                //print nothing
             }
         }
     }
