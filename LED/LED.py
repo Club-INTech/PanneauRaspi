@@ -25,7 +25,7 @@ connection.listen(5)
 sgl.signal(sgl.SIGTERM, terminate)
 sgl.signal(sgl.SIGUSR1, terminate)
 PID = open("/home/pi/panneauRaspi/LED/PID", "w")
-PID.write(str(os.getpid()))
+PID.write(str(os.getpid()) + "\n")
 PID.close()
 # os.system('sudo echo "' + os.getpid() + '"\n >/home/pi/panneauRaspi/LED/PID')
 
