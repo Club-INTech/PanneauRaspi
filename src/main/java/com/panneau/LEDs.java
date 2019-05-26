@@ -60,7 +60,11 @@ public class LEDs {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+            try {
+                Thread.sleep(20);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
         }
         if(!initiated) {
             try {
