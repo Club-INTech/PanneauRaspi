@@ -49,7 +49,7 @@ class Segments {
         }
         try{
             device=i2CBus.getDevice(0x71);
-            test37();
+            suus();
         }catch (IOException e) {
             System.out.println("Reset de l'afficheur nécessaire");
             if (!scan) {
@@ -62,7 +62,7 @@ class Segments {
             //System.out.println("Connecté à l'adresse "+String.format("0x%x", displayAddress));
             //*/
             device = i2CBus.getDevice(0x71);
-            test37();
+            suus();
         }
     }
 
@@ -121,7 +121,7 @@ class Segments {
             try{
                 System.err.println("Factory reset sur le broadcast");
                 i2CBus.getDevice(0x00).write((byte) 0x81);
-                test37();
+                suus();
             } catch (IOException e) {
                 System.err.println("Factory reset sur toutes les adresses");
                 for (int displayAddress = 0x03; displayAddress <= 0x77; ++displayAddress) {
@@ -142,5 +142,10 @@ class Segments {
         }catch (TooManyDigitsException er){
             //NTM ya ke 2 digits
         }
+    }
+
+    private void suus() throws IOException{
+        byte[] buff={0b00110101, 0b01010101, 0b01010101, 0b00110101};
+        device.write(buff);
     }
 }
