@@ -37,13 +37,14 @@ class Segments {
         int i=0;
         while(i2CBus==null) {
             try {
-                //System.out.println("Test sur port "+i);
+                System.out.println("Tentative de récupération d'une instance du port "+i);
                 i2CBus = I2CFactory.getInstance(i);
             } catch (I2CFactory.UnsupportedBusNumberException e) {
+                System.err.println("Echec");
                 ++i;
             }
             if(i==18){
-                //System.out.println("Ports de 0 à 17 testés, aucun ne répond");
+                System.err.println("Ports de 0 à 17 testés, aucun ne répond");
                 throw new I2CFactory.UnsupportedBusNumberException();
             }
         }
