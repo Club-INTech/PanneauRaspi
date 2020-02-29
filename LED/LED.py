@@ -1,41 +1,58 @@
 import sys
-import board
-import neopixel
 import socket
 import signal as sgl
 import os
-import smbus
+import Jetson.GPIO as GPIO
 
 
 def terminate(signalNumber, frame):
-	pixels.fill((0, 0, 0))
-	pixels.deinit()
-	i2c.write_byte(0x71, 0x76)
+	# i2c.write_byte(0x71, 0x76)
+	TCPconnection.close()
+	UDPconnection.close()
+	GPIO.cleanup()
 	exit(0)
 
 
-adr = 0x71
+def ISR(channel):
+	if GPIO.input(channel) == GPIO.LOW:
+		UDPconnection.sendto(b"JAUNE", ("localhost", UDPport))
+	else:
+		UDPconnection.sendto(b"BLEU", ("localhost", UDPport))
+
+
+adr = 0x71  # adresse i2c du 7 segments
+switch_pin = 0
+blue_pin = 0
+yellow_pin = 0
+GPIO.setmode(GPIO.BOARD)
 
 # sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
-port = int(sys.argv[1])
-ledCount = int(sys.argv[2])
-pixels = neopixel.NeoPixel(board.D18, ledCount, brightness=0.1)
+
+TCPport = int(sys.argv[1])
+UDPport = int(sys.argv[2])
 
 # led server
-connection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-connection.bind(('', port))
-connection.listen(5)
+TCPconnection = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+TCPconnection.bind(('', TCPport))
+TCPconnection.listen(5)
+
+# switch server
+UDPconnection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 sgl.signal(sgl.SIGTERM, terminate)
 sgl.signal(sgl.SIGUSR1, terminate)
-PID = open("/home/pi/panneauRaspi/LED/PID", "w")
+PID = open("/home/intech/panneauRaspi/LED/PID", "w")
 PID.write(str(os.getpid()) + "\n")
 PID.close()
 # os.system('sudo echo "' + os.getpid() + '"\n >/home/pi/panneauRaspi/LED/PID')
-i2c = smbus.SMBus(1);
+# i2c = smbus.SMBus(1)
+
+GPIO.setup(switch_pin, GPIO.IN)
+GPIO.add_event_detect(switch_pin, GPIO.BOTH, callback=ISR, bouncetime=10)
+GPIO.setup((blue_pin, yellow_pin), GPIO.OUT)
 
 while True:
-	client, info = connection.accept()
+	client, info = TCPconnection.accept()
 	while True:
 		try:
 			data = client.recv(1024)
@@ -48,30 +65,20 @@ while True:
 				continue
 			command = parts[0]
 			args = parts[1:]
-			if command == "fill":
-				if len(args) == 3:
-					r = int(255*float(args[0]))
-					g = int(255*float(args[1]))
-					b = int(255*float(args[2]))
-					pixels.fill((r, g, b))
-			elif command == "set":
-				if len(args) == 4:
-					index = int(args[0])
-					r = int(255*float(args[1]))
-					g = int(255*float(args[2]))
-					b = int(255*float(args[3]))
-					pixels[index] = (r, g, b)
-			elif command == "range":
-				if len(args) == 5:
-					start = int(args[0])
-					end = int(args[1])
-					r = int(255*float(args[2]))
-					g = int(255*float(args[3]))
-					b = int(255*float(args[4]))
-					for index in range(start, end+1):
-						pixels[index] = (r, g, b)
-			elif command == "update":
-				pixels.show()
+			if command == "set":
+				if len(args) == 1:
+					color = args[0]
+					if color == "BLEU":
+						GPIO.output(yellow_pin, GPIO.LOW)
+						GPIO.output(blue_pin, GPIO.HIGH)
+					elif color == "JAUNE":
+						GPIO.output(yellow_pin, GPIO.HIGH)
+						GPIO.output(blue_pin, GPIO.LOW)
+					else:
+						GPIO.output((yellow_pin, blue_pin), GPIO.LOW)
+				else:
+					GPIO.output((yellow_pin, blue_pin), GPIO.LOW)
+			"""
 			elif command == "score":
 				if len(args) == 1:
 					nb = int(args[0])
@@ -92,5 +99,6 @@ while True:
 						i2c.write_byte_data(adr, 0x7A, args[0])
 					else:
 						print("Erreur valeur de luminosité doit être comprise entre 0 et 255")
+			"""
 		except Exception as e:
 			print(e)

@@ -1,67 +1,85 @@
 package com.panneau;
 
-import com.pi4j.io.gpio.*;
-import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.panneau.Panneau.teamColorChangeListener;
+
 /**
  * Cette classe permet de récupérer l'etat d'un interrupteur
+ *
  * @author rene
- * @version 1.0
- * @since ever
+ * @version 2020.1
  */
 class Interrupteur {
-    private GpioController parent;
-    private GpioPinDigitalInput pin;
-    private PinState state;
-    private List<StateChangeListener> listeners=new ArrayList<>();
+    private List<Panneau.teamColorChangeListener> listeners = new ArrayList<>();
+    private Panneau.TeamColor color = Panneau.TeamColor.UNDEFINED;
+
+    private class PythonListenerThread implements Runnable {
+        private DatagramSocket UDPSocket;
+
+        PythonListenerThread(int UDPJavaPort) {
+            try {
+                UDPSocket = new DatagramSocket(UDPJavaPort);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (UDPSocket != null) {
+                    byte[] buff = new byte[1024];
+                    DatagramPacket packet = new DatagramPacket(buff, buff.length);
+                    UDPSocket.receive(packet);                                      //méthode bloquante
+                    String data = new String(packet.getData());
+                    if (data.equals("JAUNE")) {
+                        color = Panneau.TeamColor.JAUNE;
+                    } else if (data.equals("BLEU")) {
+                        color = Panneau.TeamColor.BLEU;
+                    } else {
+                        color = Panneau.TeamColor.UNDEFINED;
+                    }
+                    for (teamColorChangeListener listener : listeners) {
+                        listener.handleTeamColorChangedEvent(color);
+                    }
+                    System.out.println("Couleur : "+data);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (UDPSocket != null)
+                        UDPSocket.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    }
 
     /**
      * Cette méthode permet d'ajouter un listener attendant un changement de couleur
+     *
      * @param listener Inmplémentation de l'interface <code>StateChangeListener</code>
      */
-    void addListener(StateChangeListener listener){
+    void addListener(teamColorChangeListener listener) {
         listeners.add(listener);
-    }
-
-    private void stateChanged(){
-        for(StateChangeListener listener:listeners){
-            listener.handleStateChangedEvent();
-        }
     }
 
     /**
      * Crée une instance d'interrupteur
-     * @param pin Pin sur lequel est branché l'interrupteur
-     * @param gpio Contôleur gpio de la raspi. Mettre <code>null</code> s'il n'a pas encore été initialisé.
      */
-    Interrupteur(Pin pin, GpioController gpio){
-        if(gpio==null){
-            parent= GpioFactory.getInstance();
-        }else{
-            parent=gpio;
-        }
-        this.pin=parent.provisionDigitalInputPin(pin, "Switch_Pin", PinPullResistance.PULL_UP);
-        parent.setShutdownOptions(true);
-        this.pin.setDebounce(50);
-        this.pin.addListener((GpioPinListenerDigital)event->{state=event.getState();this.stateChanged();});
-        state=this.pin.getState();
+    Interrupteur(int UDPJavaPort) {
+        PythonListenerThread pythonListenerThread = new PythonListenerThread(UDPJavaPort);
+        pythonListenerThread.run();
     }
 
-    /**
-     * Permet de récupérer la valeur du pin.
-     * @return La valeur du pin
-     */
-    PinState getState(){
-        return state;
-    }
-
-    /**
-     * Interface permettant d'éxécuter du code lors d'un evènement de changement de couleur.
-     */
-    interface StateChangeListener {
-        void handleStateChangedEvent();
+    public Panneau.TeamColor getColor() {
+        return color;
     }
 }

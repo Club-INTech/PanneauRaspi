@@ -1,11 +1,5 @@
 package com.panneau;
 
-
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
-import com.pi4j.io.i2c.I2CFactory;
-
 import java.io.IOException;
 
 import java.util.ArrayList;
@@ -15,7 +9,7 @@ import java.util.List;
  * Cette classe permet de commander le panneau comprenant l'afficheur 7 segments,
  * la LED RGB, et le switch.
  * @author rene
- * @version 0.4
+ * @version 1.0
  * @since ever
  */
 public class Panneau {
@@ -28,103 +22,57 @@ public class Panneau {
     /**
      * Enumère les deux couleurs d'équipe possibles
      */
-    public enum TeamColor {JAUNE, VIOLET;
+    public enum TeamColor {JAUNE, BLEU, UNDEFINED;
         @Override
         public String toString() {
-            if(this==JAUNE){
-                return "JAUNE";
-            }
-            return "VIOLET";
+            return name();
         }
     }
 
-    /**
-     * Crée une instance de panneau, en initialisant tous les paramètres par défaut;
-     * @throws I2CFactory.UnsupportedBusNumberException Cette exception est levée si
-     * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
-     * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
-     */
-    public Panneau(int ledCount, int programPort, boolean useSegments)throws IOException, I2CFactory.UnsupportedBusNumberException {
-        this(ledCount, programPort, RaspiPin.GPIO_07, useSegments);
-    }
-
-    public  Panneau(int ledCount, int programPort) throws  IOException, I2CFactory.UnsupportedBusNumberException{
-        this(ledCount, programPort, true);
-    }
-
-    public Panneau(int ledCount, int programPort, Pin SwitchPin) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        this(ledCount, programPort, SwitchPin, true);
-    }
 
         /**
-         * Crée une instance de panneau en spécifiant les pins à utiliser.
-         * @param SwitchPin pin en pullup reliée à l'intterrupteur
-         * @throws I2CFactory.UnsupportedBusNumberException Cette exception est levée si
+         * Crée une instance de panneau.
          * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
          * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
          */
-    public Panneau(int ledCount, int programPort, Pin SwitchPin, boolean useSegments) throws IOException, I2CFactory.UnsupportedBusNumberException {
-        if(useSegments){
+    public Panneau(int pythonTCPPort, int javaUDPPort, boolean useSegments) throws IOException {
+        /*if(useSegments){
             segments=new Segments(true);
             try{
                 segments.write(37);
             }catch (IOException | TooManyDigitsException e){
                 System.err.println("Erreur d'initialisation du panneau");
             }
-        }
-        leds =new LEDs(ledCount, programPort);
-        interrupteur=new Interrupteur(SwitchPin, null);
-        if(interrupteur.getState()==PinState.HIGH){
-            teamColor= TeamColor.JAUNE;
-        }else{
-            teamColor= TeamColor.VIOLET;
-        }
+        }*/
+        leds =new LEDs(pythonTCPPort, javaUDPPort);
+        interrupteur=new Interrupteur(javaUDPPort);
+        teamColor = interrupteur.getColor();
         listeners=new ArrayList<>();
-        interrupteur.addListener(()->{
+        interrupteur.addListener((newColor)->{
             //System.out.println("tout va bien");
-            if(interrupteur.getState()==PinState.HIGH){
-                teamColor = TeamColor.JAUNE;
-                leds.fillColor(LEDs.RGBColor.JauneNeopixel);
+            if(newColor == TeamColor.JAUNE){
+                leds.set(LEDs.Color.JAUNE);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
                 System.out.println("JAUNE");
-            }else{
-                teamColor = TeamColor.VIOLET;
-                leds.fillColor(LEDs.RGBColor.VioletNeopixel);
+            }else if (newColor == TeamColor.BLEU){
+                leds.set(LEDs.Color.BLEU);
                 for(teamColorChangeListener listener:listeners){
-                    listener.handleTeamColorChangedEvent(Panneau.TeamColor.VIOLET);
+                    listener.handleTeamColorChangedEvent(Panneau.TeamColor.BLEU);
                 }
-                System.out.println("VIOLET");
+                System.out.println("BLEU");
+            }else{
+                leds.set(LEDs.Color.NOIR);
+                for(teamColorChangeListener listener:listeners){
+                    listener.handleTeamColorChangedEvent(TeamColor.UNDEFINED);
+                }
             }
         });
-
-        if(isYellow()){
-            leds.fillColor(LEDs.RGBColor.JAUNE);
-        }else {
-            leds.fillColor(LEDs.RGBColor.MAGENTA);
-        }
-
     }
 
     public LEDs getLeds() {
         return leds;
-    }
-
-    /**
-     * Cette méthode permet de récupérer la TeamColor donnée par l'utilisateur
-     * @return vrai si le switch est en position jaune.
-     */
-    public boolean isYellow(){
-        return teamColor == TeamColor.JAUNE;
-    }
-
-    /**
-     * Cette méthode permet de récupérer la TeamColor donnée par l'utilisateur
-     * @return vrai si le switch est en position violette.
-     */
-    public boolean isViolet(){
-        return teamColor == TeamColor.VIOLET;
     }
 
     /**
@@ -154,7 +102,7 @@ public class Panneau {
      * @param toAdd implémentation de l'interface <code>teamColorChangeListener</code> gérant l'évènement lors de l'appel
      */
     public void addListener(teamColorChangeListener toAdd){
-        listeners.add(toAdd);
+        interrupteur.addListener(toAdd);
     }
 
     /**

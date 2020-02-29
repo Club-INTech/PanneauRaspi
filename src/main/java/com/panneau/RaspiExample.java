@@ -7,7 +7,7 @@ public class RaspiExample {
 
     public static void main(String[] args) throws IOException, UnsupportedBusNumberException, TooManyDigitsException {
 
-        Panneau panel=new Panneau(16, 18900);
+        Panneau panel=new Panneau(16, 65533,false);
         int i=Integer.parseInt(args[0]);
         System.out.println(i);
         panel.printScore(i);
@@ -17,7 +17,7 @@ public class RaspiExample {
         int index = 0;
         while (true){
             try {
-                panel.getLeds().set(index, new LEDs.RGBColor(f % 1f, (f+1f/3f) % 1f, (f+2f/3f) % 1f));
+                panel.getLeds().set(LEDs.Color.NOIR);
                 index++;
                 index %= 16;
                 f += 0.1f;
