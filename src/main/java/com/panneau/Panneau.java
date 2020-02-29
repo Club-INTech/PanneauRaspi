@@ -55,13 +55,11 @@ public class Panneau {
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
                 }
-                System.out.println("JAUNE");
             }else if (newColor == TeamColor.BLEU){
                 leds.set(LEDs.Color.BLEU);
                 for(teamColorChangeListener listener:listeners){
                     listener.handleTeamColorChangedEvent(Panneau.TeamColor.BLEU);
                 }
-                System.out.println("BLEU");
             }else{
                 leds.set(LEDs.Color.NOIR);
                 for(teamColorChangeListener listener:listeners){

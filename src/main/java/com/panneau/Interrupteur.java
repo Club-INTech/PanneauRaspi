@@ -18,7 +18,7 @@ class Interrupteur {
     private List<Panneau.teamColorChangeListener> listeners = new ArrayList<>();
     private Panneau.TeamColor color = Panneau.TeamColor.UNDEFINED;
 
-    private class PythonListenerThread implements Runnable {
+    private class PythonListenerThread extends Thread implements Runnable {
         private DatagramSocket UDPSocket;
 
         PythonListenerThread(int UDPJavaPort) {
@@ -35,8 +35,10 @@ class Interrupteur {
                 while (UDPSocket != null) {
                     byte[] buff = new byte[1024];
                     DatagramPacket packet = new DatagramPacket(buff, buff.length);
+                    System.out.println("Waiting for UDP packet from python on port "+UDPSocket.getLocalPort());
                     UDPSocket.receive(packet);                                      //méthode bloquante
-                    String data = new String(packet.getData());
+                    String data = new String(packet.getData()).replace("\0","");
+                    System.out.println("UDP packet recieved from "+packet.getPort() + " containing "+data);
                     if (data.equals("JAUNE")) {
                         color = Panneau.TeamColor.JAUNE;
                     } else if (data.equals("BLEU")) {
@@ -76,7 +78,7 @@ class Interrupteur {
      */
     Interrupteur(int UDPJavaPort) {
         PythonListenerThread pythonListenerThread = new PythonListenerThread(UDPJavaPort);
-        pythonListenerThread.run();
+        pythonListenerThread.start();
     }
 
     public Panneau.TeamColor getColor() {

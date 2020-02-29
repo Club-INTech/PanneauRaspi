@@ -13,7 +13,7 @@ import java.net.Socket;
 public class LEDs {
 
     private int serverTCPPort;
-    private int serverUDPPort;
+    private int clientUDPPort;
     private boolean initiated;
     private Socket TCPsocket;
     private PrintStream output;
@@ -25,7 +25,7 @@ public class LEDs {
      */
     public LEDs(int serverTCPPort, int clientUDPPort) {
         this.serverTCPPort = serverTCPPort;
-        this.serverUDPPort = clientUDPPort;
+        this.clientUDPPort = clientUDPPort;
     }
 
     /**
@@ -36,7 +36,7 @@ public class LEDs {
             return;
         }
         if( ! triedToLaunch) {
-            ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/intech/panneauRaspi/LED/LED.py " + serverTCPPort + " "+ serverUDPPort);
+            ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/intech/PanneauRaspi/LED/LED.py " + serverTCPPort + " "+ clientUDPPort);
             //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             try {
                 Process process = builder.start();
@@ -44,7 +44,6 @@ public class LEDs {
                     @Override
                     public void run() {
                         super.run();
-                        process.destroyForcibly();
                         try {
                             if(TCPsocket != null) {
                                 TCPsocket.close();
@@ -52,6 +51,10 @@ public class LEDs {
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
+                        System.out.println("killing python");
+                        process.destroy();
+                        process.destroyForcibly();
+                        System.out.println("python killed");
                     }
                 });
                 triedToLaunch = true;
@@ -69,6 +72,7 @@ public class LEDs {
                 TCPsocket = new Socket("localhost", serverTCPPort);
                 output = new PrintStream(TCPsocket.getOutputStream(), true);
                 initiated = true;
+                System.out.println("Connection TCP au serveur python établie");
             } catch (IOException e) {
                 System.err.println("Echec de la connexion au process, réessai plus tard...");
                 e.printStackTrace();

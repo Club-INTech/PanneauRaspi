@@ -20,10 +20,12 @@ def ISR(channel):
 		UDPconnection.sendto(b"BLEU", ("localhost", UDPport))
 
 
+GPIO.cleanup()
+
 adr = 0x71  # adresse i2c du 7 segments
-switch_pin = 0
-blue_pin = 0
-yellow_pin = 0
+switch_pin = 7
+blue_pin = 11
+yellow_pin = 13
 GPIO.setmode(GPIO.BOARD)
 
 # sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
@@ -41,11 +43,12 @@ UDPconnection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 sgl.signal(sgl.SIGTERM, terminate)
 sgl.signal(sgl.SIGUSR1, terminate)
-PID = open("/home/intech/panneauRaspi/LED/PID", "w")
+PID = open("/home/intech/PanneauRaspi/LED/PID", "w")
 PID.write(str(os.getpid()) + "\n")
 PID.close()
 # os.system('sudo echo "' + os.getpid() + '"\n >/home/pi/panneauRaspi/LED/PID')
 # i2c = smbus.SMBus(1)
+
 
 GPIO.setup(switch_pin, GPIO.IN)
 GPIO.add_event_detect(switch_pin, GPIO.BOTH, callback=ISR, bouncetime=10)
