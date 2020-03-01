@@ -2,6 +2,10 @@ package com.panneau;
 
 import java.io.IOException;
 
+import java.io.PrintStream;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,11 +17,15 @@ import java.util.List;
  * @since ever
  */
 public class Panneau {
-    private Segments segments;
-    private LEDs leds;
-    private Interrupteur interrupteur;
-    private static TeamColor teamColor;
+    private static TeamColor teamColor = TeamColor.UNDEFINED;
     private List<teamColorChangeListener> listeners;
+    private int serverTCPPort;
+    private int clientUDPPort;
+    private boolean initiated;
+    private Socket TCPsocket;
+    private PrintStream output;
+    private StringBuilder builder = new StringBuilder();
+    private boolean triedToLaunch;
 
     /**
      * Enumère les deux couleurs d'équipe possibles
@@ -29,62 +37,44 @@ public class Panneau {
         }
     }
 
+    public enum LedColor {
+        BLEU,
+        JAUNE,
+        NOIR;
 
-        /**
-         * Crée une instance de panneau.
-         * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
-         * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
-         */
-    public Panneau(int pythonTCPPort, int javaUDPPort, boolean useSegments) throws IOException {
-        /*if(useSegments){
-            segments=new Segments(true);
-            try{
-                segments.write(37);
-            }catch (IOException | TooManyDigitsException e){
-                System.err.println("Erreur d'initialisation du panneau");
-            }
-        }*/
-        leds =new LEDs(pythonTCPPort, javaUDPPort);
-        interrupteur=new Interrupteur(javaUDPPort);
-        teamColor = interrupteur.getColor();
-        listeners=new ArrayList<>();
-        interrupteur.addListener((newColor)->{
-            //System.out.println("tout va bien");
-            if(newColor == TeamColor.JAUNE){
-                leds.set(LEDs.Color.JAUNE);
-                for(teamColorChangeListener listener:listeners){
-                    listener.handleTeamColorChangedEvent(Panneau.TeamColor.JAUNE);
-                }
-            }else if (newColor == TeamColor.BLEU){
-                leds.set(LEDs.Color.BLEU);
-                for(teamColorChangeListener listener:listeners){
-                    listener.handleTeamColorChangedEvent(Panneau.TeamColor.BLEU);
-                }
-            }else{
-                leds.set(LEDs.Color.NOIR);
-                for(teamColorChangeListener listener:listeners){
-                    listener.handleTeamColorChangedEvent(TeamColor.UNDEFINED);
-                }
-            }
-        });
-    }
-
-    public LEDs getLeds() {
-        return leds;
+        @Override
+        public String toString() {
+            return this.name();
+        }
     }
 
     /**
-     * Cette méthode permet d'afficher le score
-     * @param score La valeur à afficher
-     * @throws IOException En cas d'erreur de transmission
-     * @throws TooManyDigitsException Si le nombre à afficher est trop grand
+     * Cette interface sert à gérer les évènements de changement de la couleur d'équipe.
      */
-    public void printScore(int score) throws IOException,TooManyDigitsException{
-        if(segments==null){
-            System.err.println("Grâce à @rene il n'y a plus de NPE ici, mais arrêtez d'essayer d'afficher du score sur le secondaire svp.");
-            return;
-        }
-        segments.write(score);
+    public interface teamColorChangeListener{
+        void handleTeamColorChangedEvent(TeamColor newColor);
+    }
+
+    /**
+     * Crée une instance de panneau.
+     * le modèle de Raspberry utilisé n'a pas de bus I2C compatible avec cette bibliothèque.
+     * @throws IOException Cette exception est levée en cas d'erreur de communication durant l'initialisation du bus I2C
+     */
+    public Panneau(int pythonTCPPort, int javaUDPPort, boolean useSegments) throws IOException {
+        this.serverTCPPort = pythonTCPPort;
+        this.clientUDPPort = javaUDPPort;
+        PythonListenerThread pythonListenerThread = new PythonListenerThread(javaUDPPort);
+        pythonListenerThread.start();
+        listeners=new ArrayList<>();
+        addListener((newColor)->{
+            if(newColor == TeamColor.JAUNE){
+                setLeds(LedColor.JAUNE);
+            }else if (newColor == TeamColor.BLEU){
+                setLeds(LedColor.BLEU);
+            }else{
+                setLeds(LedColor.NOIR);
+            }
+        });
     }
 
     /**
@@ -96,17 +86,134 @@ public class Panneau {
     }
 
     /**
+     * Cette méthode permet d'afficher le score
+     * @param score La valeur à afficher
+     */
+    public void printScore(int score) {
+        ensureInitiated();
+        sendCommand("score", score);
+    }
+
+    public void setLeds(LedColor c) {
+        ensureInitiated();
+        sendCommand("set", c.toString());
+    }
+
+    /**
      * Cette méthode permet d'ajouter un listener attendant un event de changement de couleur.
      * @param toAdd implémentation de l'interface <code>teamColorChangeListener</code> gérant l'évènement lors de l'appel
      */
     public void addListener(teamColorChangeListener toAdd){
-        interrupteur.addListener(toAdd);
+        listeners.add(toAdd);
     }
 
     /**
-     * Cette interface sert à gérer les évènements de changement de la couleur d'équipe.
+     * Envoie une commande au programme qui gère les LEDs
+     * @param parameters
      */
-    public interface teamColorChangeListener{
-        void handleTeamColorChangedEvent(TeamColor newColor);
+    private void sendCommand(Object... parameters) {
+        builder.setLength(0); // reset
+        for(Object obj : parameters) {
+            builder.append(obj).append(" ");
+        }
+        if(output != null) {
+            output.println(builder.toString());
+            output.flush();
+        }
+    }
+
+    private void ensureInitiated() {
+        if(initiated) {
+            return;
+        }
+        if( ! triedToLaunch) {
+            ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "python3 /home/intech/PanneauRaspi/LED/LED.py " + serverTCPPort + " "+ clientUDPPort);
+            //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            try {
+                Process process = builder.start();
+                Runtime.getRuntime().addShutdownHook(new Thread() {
+                    @Override
+                    public void run() {
+                        super.run();
+                        try {
+                            if(TCPsocket != null) {
+                                TCPsocket.close();
+                            }
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                        System.out.println("killing python");
+                        process.destroy();
+                        process.destroyForcibly();
+                        System.out.println("python killed");
+                    }
+                });
+                triedToLaunch = true;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            try {
+                Thread.sleep(20);
+            }catch (InterruptedException e){
+                e.printStackTrace();
+            }
+        }
+        if(!initiated) {
+            try {
+                TCPsocket = new Socket("localhost", serverTCPPort);
+                output = new PrintStream(TCPsocket.getOutputStream(), true);
+                initiated = true;
+                System.out.println("Connection TCP au serveur python établie");
+            } catch (IOException e) {
+                System.err.println("Echec de la connexion au process, réessai plus tard...");
+                e.printStackTrace();
+            }
+        }
+    }
+
+    private class PythonListenerThread extends Thread implements Runnable {
+        private DatagramSocket UDPSocket;
+
+        PythonListenerThread(int UDPJavaPort) {
+            try {
+                UDPSocket = new DatagramSocket(UDPJavaPort);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        @Override
+        public void run() {
+            try {
+                while (UDPSocket != null) {
+                    byte[] buff = new byte[1024];
+                    DatagramPacket packet = new DatagramPacket(buff, buff.length);
+                    System.out.println("Waiting for UDP packet from python on port "+UDPSocket.getLocalPort());
+                    UDPSocket.receive(packet);                                      //méthode bloquante
+                    String data = new String(packet.getData()).replace("\0","");
+                    System.out.println("UDP packet recieved from "+packet.getPort() + " containing "+data);
+                    if (data.equals("JAUNE")) {
+                        teamColor = Panneau.TeamColor.JAUNE;
+                    } else if (data.equals("BLEU")) {
+                        teamColor = Panneau.TeamColor.BLEU;
+                    } else {
+                        teamColor = Panneau.TeamColor.UNDEFINED;
+                    }
+                    for (teamColorChangeListener listener : listeners) {
+                        listener.handleTeamColorChangedEvent(teamColor);
+                    }
+                    System.out.println("Couleur : "+data);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            } finally {
+                try {
+                    if (UDPSocket != null)
+                        UDPSocket.close();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

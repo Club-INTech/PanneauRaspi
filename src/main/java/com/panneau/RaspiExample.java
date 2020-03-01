@@ -1,11 +1,10 @@
 package com.panneau;
 
-import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 import java.io.IOException;
 
 public class RaspiExample {
 
-    public static void main(String[] args) throws IOException, UnsupportedBusNumberException, TooManyDigitsException {
+    public static void main(String[] args) throws IOException {
 
         Panneau panel=new Panneau(65100, 65100,false);
         int i=Integer.parseInt(args[0]);
@@ -17,7 +16,7 @@ public class RaspiExample {
         int index = 0;
         while (true){
             try {
-                panel.getLeds().set(LEDs.Color.NOIR);
+                panel.setLeds(Panneau.LedColor.NOIR);
                 index++;
                 index %= 16;
                 f += 0.1f;
