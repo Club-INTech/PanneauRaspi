@@ -36,7 +36,7 @@ public class LEDs {
             return;
         }
         if( ! triedToLaunch) {
-            ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "sudo python3 /home/intech/PanneauRaspi/LED/LED.py " + serverTCPPort + " "+ clientUDPPort);
+            ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c", "python3 /home/intech/PanneauRaspi/LED/LED.py " + serverTCPPort + " "+ clientUDPPort);
             //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
             try {
                 Process process = builder.start();

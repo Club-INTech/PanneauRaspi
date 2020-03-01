@@ -11,7 +11,7 @@ public class RaspiExample {
         int i=Integer.parseInt(args[0]);
         System.out.println("Tentative d'afficher "+i);
         //panel.printScore(i);
-        panel.addListener(newColor -> System.out.println(newColor));
+        panel.addListener(System.out::println);
         System.out.println("Couleur: "+panel.getTeamColor());
         float f = 0f;
         int index = 0;
