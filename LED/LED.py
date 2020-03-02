@@ -2,8 +2,15 @@ import sys
 import socket
 import signal as sgl
 import os
-import Jetson.GPIO as GPIO
-import smbus2 as bus
+
+useHardware = True
+try:
+    import smbus2 as bus
+    import Jetson.GPIO as GPIO
+except:
+    print("Exception in import")
+    useHardware = False
+
 
 
 # I2C fonctionnel pour ce module d'affichage:
@@ -14,7 +21,8 @@ def terminate(signalNumber, frame):
     # i2c.write_byte(0x71, 0x76)
     TCPconnection.close()
     UDPconnection.close()
-    GPIO.cleanup()
+    if useHardware:
+        GPIO.cleanup()
     exit(0)
 
 
@@ -34,7 +42,8 @@ adr = 0x71  # adresse i2c du 7 segments
 switch_pin = 7
 blue_pin = 11
 yellow_pin = 13
-GPIO.setmode(GPIO.BOARD)
+if useHardware:
+    GPIO.setmode(GPIO.BOARD)
 
 # sudo pip3 install rpi_ws281x adafruit-circuitpython-neopixel
 
@@ -51,17 +60,19 @@ UDPconnection = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 
 sgl.signal(sgl.SIGTERM, terminate)
 sgl.signal(sgl.SIGUSR1, terminate)
-PID = open("/home/intech/PanneauRaspi/LED/PID", "w")
+#PID = open("/home/intech/PanneauRaspi/LED/PID", "w")
+PID = open(os.path.dirname(os.path.realpath(__file__))+"/PID", "w")
 PID.write(str(os.getpid()) + "\n")
 PID.close()
 # os.system('sudo echo "' + os.getpid() + '"\n >/home/pi/panneauRaspi/LED/PID')
 
-i2c = bus.SMBus(1)
-GPIO.setup(switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # les GPIO de Jetson ne permettent pas de configurer le pullup interne, il faut en faire un hardware
-GPIO.add_event_detect(switch_pin, GPIO.BOTH, callback=ISR, bouncetime=10)
-GPIO.setup((blue_pin, yellow_pin), GPIO.OUT, initial=GPIO.LOW)
+if useHardware:
+    i2c = bus.SMBus(1)
+    GPIO.setup(switch_pin, GPIO.IN, pull_up_down=GPIO.PUD_UP)  # les GPIO de Jetson ne permettent pas de configurer le pullup interne, il faut en faire un hardware
+    GPIO.add_event_detect(switch_pin, GPIO.BOTH, callback=ISR, bouncetime=10)
+    GPIO.setup((blue_pin, yellow_pin), GPIO.OUT, initial=GPIO.LOW)
+    i2cwrite([0x76])  # clear display
 
-i2cwrite([0x76])  # clear display
 
 while True:
     try:
@@ -76,7 +87,7 @@ while True:
                 message = data.decode('utf-8')
                 print("Received: ", message)
                 parts = message.split()
-                if len(parts) == 0:
+                if len(parts) == 0 or not useHardware:
                     continue
                 command = parts[0]
                 args = parts[1:]

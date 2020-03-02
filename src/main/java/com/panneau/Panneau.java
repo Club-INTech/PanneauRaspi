@@ -81,6 +81,7 @@ public class Panneau {
                 setLeds(LedColor.NOIR);
             }
         });
+        ensureInitiated();
     }
 
     /**
@@ -99,7 +100,7 @@ public class Panneau {
      */
     public void printScore(int score) {
         if(!useSegments){
-            System.err.println("Affichage du score désactivé pour ce panneau");
+            System.err.println("Affichage du score désactivé pour ce panneau, n'appelez pas la fonction printScore !");
             return;
         }
         ensureInitiated();
@@ -148,8 +149,9 @@ public class Panneau {
         }
         if (!triedToLaunch) {
             ProcessBuilder builder = new ProcessBuilder("/bin/bash", "-c",
-                    "python3 /home/intech/PanneauRaspi/LED/LED.py " + serverTCPPort + " " + clientUDPPort);
+                    "python3 "+System.getProperty("user.dir")+"/LED/LED.py " + serverTCPPort + " " + clientUDPPort);
             //  builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+            System.out.println("executing: python3 "+System.getProperty("user.dir")+"/LED/LED.py " + serverTCPPort + " " + clientUDPPort);
             try {
                 Process process = builder.start();
                 Runtime.getRuntime().addShutdownHook(new Thread() {
